@@ -14,9 +14,8 @@ function TreeChart({ data }) {
   const svgRef = useRef();
   const wrapperRef = useRef();
   const dimensions = useResizeObserver(wrapperRef);
-  const [currentZoomState, setCurrentZoomSate] = useState();
-  // Flag for when node is clicked
-  var nodeClicked = false;
+  const [currentZoomState, setCurrentZoomSate] = useState("translate(-1,0) scale(1)");
+  const [nestedStateChange, setNestedStateChange] = useState(false);
   // we save data to see if it changed
   const previouslyRenderedData = usePrevious(data);
 
@@ -47,6 +46,7 @@ function TreeChart({ data }) {
     // console.warn("links", root.links());
     // Callbacks for events on nodes
     function toggleChildren(d) {
+      console.log("Source object is ", d);
       /** Toggles children on click to open/close */
       if (d.children) {
       d.data._children = d.data.children;
@@ -55,20 +55,24 @@ function TreeChart({ data }) {
       d.data.children = d.data._children;
       d.data._children = null;
       }
+      setNestedStateChange(!nestedStateChange);
     }
 
     svg.selectAll(".node").on("click", toggleChildren);
     // nodes
+    var nodes = svg.selectAll("nodes").data(root.descendants());
     svg
       .selectAll(".node")
       .data(root.descendants())
       .join(enter => enter
         .append("circle")
         .attr("opacity", 0))
+      .attr("transform", currentZoomState)
       .attr("class", "node")
       .attr("cx", node => node.x)
-      .attr("cy", node => node.y + 10)
-      .attr("r", 12)
+      .attr("cy", node => node.y)
+      .attr("r", 20)
+      .attr("z-index", 1)
       .style("fill", function(d) {
         // the (_)children property is stored in the data object of each node
         return d.data._children ? "lightsteelblue" : "#fff"; 
@@ -84,6 +88,7 @@ function TreeChart({ data }) {
       .data(root.links())
       .join("path")
       .attr("class", "link")
+      .attr("transform", currentZoomState)
       .attr("d", linkGenerator)
       .attr("stroke-dasharray", function() {
         const length = this.getTotalLength();
@@ -108,20 +113,24 @@ function TreeChart({ data }) {
     svg
       .selectAll(".label")
       .data(root.descendants())
-      .join(enter => enter.append("text").attr("opacity", 0))
+      .join(enter => enter
+        .append("text")
+        .attr("opacity", 0))
+        .attr("transform", currentZoomState)  // the zoom state should be applied to all entering elements
       .attr("class", "label")
-      .attr("x", node => node.x)
-      .attr("y", node => node.y)
+      .attr("x", node => node.x*0.9)
+      .attr("y", node => node.y*1.1)
       .attr("text-anchor", "middle")
       .attr("font-size", 24)
       .text(node => node.data.name)
       .transition()
       .duration(500)
-      .delay(node => node.depth * 300)
+      .delay(node => 300)
       .attr("opacity", 1);
 
     function zoomed() {
       const zoomState = zoomTransform(svg.node());
+      setCurrentZoomSate(zoomState.toString())
       // console.log(zoomState.toString())
       svg
       .selectAll(".node,.link,.label")  // this is using D3's syntax for selecting multiple classes.
@@ -130,7 +139,7 @@ function TreeChart({ data }) {
     const zoom1 = zoom().on("zoom", zoomed);;
     svg.call(zoom1)
     console.log("data was", data)
-  }, [data, dimensions, currentZoomState, previouslyRenderedData, nodeClicked]);
+  }, [data, dimensions, currentZoomState, previouslyRenderedData, nestedStateChange]);
   // ^ When dimensions change (which will happen whenever a resize occurs), the svg drawings
   // will re-render with new dimensions.
   return (
