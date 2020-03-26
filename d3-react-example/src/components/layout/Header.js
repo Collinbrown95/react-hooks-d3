@@ -14,6 +14,7 @@ import BetaBanner from "./BetaBanner.js";
 import orgChartLogo from '../images/org-chart-logo.png';
 import searchIcon from '../images/search.png';
 import aboutIcon from '../images/about.png';
+import Logo from './Logo.js';
 
 
 class Header extends Component {
@@ -23,6 +24,7 @@ class Header extends Component {
             <React.Fragment>
                 <HeaderContainer>
                     <AcronymLogo>
+                        {/* <Logo/> */}
                         <img alt="Acronym Wiki" src={orgChartLogo} width="50" height="50" />
                         <Title>Org Chart</Title>
                     </AcronymLogo>

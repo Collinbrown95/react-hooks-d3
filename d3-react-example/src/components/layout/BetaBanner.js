@@ -5,9 +5,6 @@ import {
     BetaBannerDiv,
     BetaLogoStyle,
     BetaTextStyle,
-    FeedbackContainer,
-    Feedback,
-    EmailButton,
 } from "./beta-banner-styles.js";
 
 import emailIcon from '../images/send-email.png';
@@ -23,8 +20,8 @@ class BetaBanner extends Component {
             <BetaBannerDiv>
                 <BetaLogoStyle>&#x3B2;&eta;&tau;&alpha;</BetaLogoStyle>
                 <BetaTextStyle>
-                    Org Chart is in the 
-                    <span style={{color: "#dc006c"}}>beta</span>
+                    Org Chart is in the
+                    <span style={{color: "#dc006c"}}> beta </span>
                      phase of development.
                 </BetaTextStyle>
             </BetaBannerDiv>
