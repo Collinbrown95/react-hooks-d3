@@ -45,7 +45,7 @@ function SimpleTreeChart({ data }) {
     width = width - margin.right - margin.left;
     height = height - margin.top - margin.bottom;
     // Variables to hold animation duration and node counter
-    var i;
+    var i=0;
     
     // Create the tree layout
     const treeLayout = tree().size([width, height]);
@@ -71,13 +71,13 @@ function SimpleTreeChart({ data }) {
         // The treeLayout enriches the root with x and y coordinates
         treeLayout(root)
         // Get the nodes and links (edges) of the subtree rooted at root.
-        const nodes = root.descendants().reverse(), links = root.links();
+        const nodes = root.descendants(), links = root.links();
         // Normalize for fixed-depth.
         nodes.forEach(function(d) { d.y = d.depth * 180; });
         // Update the nodes; start by storing a selector for all elements bound to the nodes array.
         const node = svg.select("#parentContainer").selectAll("g.node")
-        .data(nodes, function(d) { return d.id || (d.id = ++i); })
-        
+          .data(nodes, function(d) { return d.id || (d.id = ++i); })
+
         // Enter new nodes at the parent's previous position
         const nodeEnter = node.enter().append("g")
         .attr("class", "node")
@@ -88,21 +88,21 @@ function SimpleTreeChart({ data }) {
         nodeEnter.append("circle")
         .attr("r", 1e-6)  // Node initializes with very small size.
         // nodes are white if leaf and light blue otherwise.
-        .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+        .style("fill", function(d) {
+            return d._children ? "lightsteelblue" : "#fff"; });
         // Append the text in the name field to each node (TODO: this should respond to the treechart layout in a more sophisticated way)
         nodeEnter.append("text")
         .attr("x", function(d) { return d.children || d._children ? -13 : 13; })
         .attr("dy", ".35em")
         .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
         .text(function(d) {
-            console.log("d object is ", d)
             return d.data.name; 
         })
         .style("fill-opacity", 1e-6);
         
         // Apply a transition to all updating nodes. All entering nodes have been set up so that the transition will
         // animate them to their desired position; all existing nodes will remain in place.
-        const nodeUpdate = nodeEnter.transition()
+        const nodeUpdate = nodeEnter.merge(node).transition()
         .duration(duration)
         // All entering nodes are initialized at the position of their parent (root is initialized at its own position),
         // so this transformation translates them from (x0, y0) to (x, y) in `duration` amount of time.
@@ -117,7 +117,7 @@ function SimpleTreeChart({ data }) {
         // Apply transition to the exiting nodes.
         const nodeExit = node.exit().transition()
           .duration(duration)
-          .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
+          .attr("transform", function(d) { return "translate(" + source.x + "," + source.y + ")"; })
           .remove();
         
         nodeExit.select("circle")
@@ -125,6 +125,40 @@ function SimpleTreeChart({ data }) {
 
         nodeExit.select("text")
           .style("fill-opacity", 1e-6);
+
+        // Apply the links
+        const link = svg.select("#parentContainer").selectAll("path.link")
+          .data(links, function(d) { return d.target.id })
+        
+        // Enter new links at the previous parent's position. For every element in the link selection, insert
+        // a path element; all path elements will be inserted before the subsequent group elements. These links
+        // will enter at their parent's previous position
+        const linkEnter = link.enter().insert("path", "g")
+          .attr("class", "link")
+	      .attr("d", function(d) {
+            var o = {x: source.x0, y: source.y0};
+		    return linkGenerator({source: o, target: o});
+          });
+        
+        // Transition the links to their new position
+        linkEnter.merge(link).transition()
+	      .duration(duration)
+          .attr("d", linkGenerator);
+        
+        // Transition exiting nodes to the parent's new position.
+        link.exit().transition()
+          .duration(duration)
+          .attr("d", function(d) {
+            var o = {x: source.x, y: source.y};
+            return linkGenerator({source: o, target: o});
+          })
+          .remove();
+
+        // Stash the old node positions for transition
+        nodes.forEach(function(d) {
+          d.x0 = d.x;
+          d.y0 = d.y;
+        });
     }
     
     /**

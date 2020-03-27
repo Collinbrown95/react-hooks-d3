@@ -32,6 +32,7 @@ export const AcronymLogo = styled.div`
 
 export const Title = styled.h1`
     font-weight: 200;
+    margin-left: 2.5%;
     @media screen and (max-width: 800px) {
         display: none;   
     }
