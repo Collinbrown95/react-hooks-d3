@@ -33,76 +33,7 @@ function SimpleTreeChart({ data }) {
         .attr("transform", zoomState.toString())
       })
     )
-  // TODO: check if i can be moved safely to the SimpleTreeChart scope so that it does not need to be passed
-  // as an argument to update.
-  /**
-   * 
-   * @param {*} source 
-   * @param {*} root
-   * @param {int} i A global variable keeping track of the number of nodes. Used to assign ID to nodes.
-   */
-  function update(source, root, i, treeLayout) {
-    // The treeLayout enriches the root with x and y coordinates
-    treeLayout(root)
-    // Get the nodes and links (edges) of the subtree rooted at root.
-    const nodes = root.descendants().reverse(), links = root.links();
-    // Normalize for fixed-depth.
-    nodes.forEach(function(d) { d.y = d.depth * 180; });
-    // Update the nodes; start by storing a selector for all elements bound to the nodes array.
-    const node = svg.select("#parentContainer").selectAll("g.node")
-      .data(nodes, function(d) { return d.id || (d.id = ++i); })
-    
-    // Enter new nodes at the parent's previous position
-    const nodeEnter = node.enter().append("g")
-      .attr("class", "node")
-      .attr("transform", function(d) { return "translate(" + source.x0 + "," + source.y0 + ")"; })
-      .on("click", click)
-    // Append a circle SVG to the set of entering elements. Node that each element of nodeEnter is its own group
-    // container that will hold a circle and a text element.
-    nodeEnter.append("circle")
-      .attr("r", 1e-6)  // Node initializes with very small size.
-      // nodes are white if leaf and light blue otherwise.
-      .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
-    // Append the text in the name field to each node (TODO: this should respond to the treechart layout in a more sophisticated way)
-    nodeEnter.append("text")
-      .attr("x", function(d) { return d.children || d._children ? -13 : 13; })
-      .attr("dy", ".35em")
-      .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
-      .text(function(d) { return d.name; })
-      .style("fill-opacity", 1e-6);
-    
-    // Apply a transition to all updating nodes. All entering nodes have been set up so that the transition will
-    // animate them to their desired position; all existing nodes will remain in place.
-    console.log("Node is ", nodeEnter.transition())
-    const nodeUpdate = nodeEnter.transition()
-      .duration(duration)
-      // All entering nodes are initialized at the position of their parent (root is initialized at its own position),
-      // so this transformation translates them from (x0, y0) to (x, y) in `duration` amount of time.
-      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
-    // Once the transition is complete, the set of circles in the updating group should arrive at the below final state.
-    nodeUpdate.select("circle")
-	  .attr("r", 10)
-	  .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
-    // Once the transition is complete, the set of text elements in the updating group should arrive at the below final state.
-    nodeUpdate.select("text")
-	  .style("fill-opacity", 1);
-  }
   
-  /**
-   * The callback for when a click event is registered on an org chart node.
-   * @param {*} d TODO
-   */
-  function click(d) {
-    if (d.children) {
-      d._children = d.children;
-      d.children = null;
-    } else {
-      d.children = d._children;
-      d._children = null;
-    }
-    update(d);
-    // update(root);
-  }
   /**
    * The hand-off point between react and d3 is here; we let d3 take control of the updating pattern inside
    * of the useEffect hook.
@@ -125,7 +56,92 @@ function SimpleTreeChart({ data }) {
     // Set initial position of the root
     root.x0 = width/2;
     root.y0 = 0;
-    update(root, root, i, treeLayout);
+    // Call update on the root
+    update(root);
+
+    // TODO: check if i can be moved safely to the SimpleTreeChart scope so that it does not need to be passed
+    // as an argument to update.
+    /**
+     * 
+     * @param {*} source 
+     * @param {*} root
+     * @param {int} i A global variable keeping track of the number of nodes. Used to assign ID to nodes.
+     */
+    function update(source) {
+        // The treeLayout enriches the root with x and y coordinates
+        treeLayout(root)
+        // Get the nodes and links (edges) of the subtree rooted at root.
+        const nodes = root.descendants().reverse(), links = root.links();
+        // Normalize for fixed-depth.
+        nodes.forEach(function(d) { d.y = d.depth * 180; });
+        // Update the nodes; start by storing a selector for all elements bound to the nodes array.
+        const node = svg.select("#parentContainer").selectAll("g.node")
+        .data(nodes, function(d) { return d.id || (d.id = ++i); })
+        
+        // Enter new nodes at the parent's previous position
+        const nodeEnter = node.enter().append("g")
+        .attr("class", "node")
+        .attr("transform", function(d) { return "translate(" + source.x0 + "," + source.y0 + ")"; })
+        .on("click", click)
+        // Append a circle SVG to the set of entering elements. Node that each element of nodeEnter is its own group
+        // container that will hold a circle and a text element.
+        nodeEnter.append("circle")
+        .attr("r", 1e-6)  // Node initializes with very small size.
+        // nodes are white if leaf and light blue otherwise.
+        .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+        // Append the text in the name field to each node (TODO: this should respond to the treechart layout in a more sophisticated way)
+        nodeEnter.append("text")
+        .attr("x", function(d) { return d.children || d._children ? -13 : 13; })
+        .attr("dy", ".35em")
+        .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+        .text(function(d) {
+            console.log("d object is ", d)
+            return d.data.name; 
+        })
+        .style("fill-opacity", 1e-6);
+        
+        // Apply a transition to all updating nodes. All entering nodes have been set up so that the transition will
+        // animate them to their desired position; all existing nodes will remain in place.
+        const nodeUpdate = nodeEnter.transition()
+        .duration(duration)
+        // All entering nodes are initialized at the position of their parent (root is initialized at its own position),
+        // so this transformation translates them from (x0, y0) to (x, y) in `duration` amount of time.
+        .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+        // Once the transition is complete, the set of circles in the updating group should arrive at the below final state.
+        nodeUpdate.select("circle")
+        .attr("r", 10)
+        .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+        // Once the transition is complete, the set of text elements in the updating group should arrive at the below final state.
+        nodeUpdate.select("text")
+        .style("fill-opacity", 1);
+        // Apply transition to the exiting nodes.
+        const nodeExit = node.exit().transition()
+          .duration(duration)
+          .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
+          .remove();
+        
+        nodeExit.select("circle")
+          .attr("r", 1e-6);
+
+        nodeExit.select("text")
+          .style("fill-opacity", 1e-6);
+    }
+    
+    /**
+     * The callback for when a click event is registered on an org chart node.
+     * @param {*} d TODO
+     */
+    function click(d) {
+        if (d.children) {
+        d._children = d.children;
+        d.children = null;
+        } else {
+        d.children = d._children;
+        d._children = null;
+        }
+        update(d);
+        // update(root);
+    }
   }, [dimensions]);
 //    [dimensions,
 //       currentZoomState,
