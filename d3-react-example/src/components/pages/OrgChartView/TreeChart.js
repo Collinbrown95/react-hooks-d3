@@ -16,11 +16,16 @@ function TreeChart({ data }) {
   const dimensions = useResizeObserver(wrapperRef);
   const [currentZoomState, setCurrentZoomSate] = useState("translate(-1,0) scale(1)");
   const [nestedStateChange, setNestedStateChange] = useState(false);
+  // const [nodesAdded, setNodesAdded] = useState()
+  // const [nodesRemoved, setNodesRemoved] = useState()
+  // const [previousNodes, setPreviousNodes] = useState()
   // we save data to see if it changed
   const previouslyRenderedData = usePrevious(data);
 
   // will be called initially and on every data change
   useEffect(() => {
+    // console.log("removed nodes ", nodesRemoved)
+    // console.log("added nodes ", nodesAdded)
     const svg = select(svgRef.current);
 
     // use dimensions from useResizeObserver,
@@ -32,6 +37,7 @@ function TreeChart({ data }) {
       // console.log("Bounding rectangle is ", wrapperRef.current.getBoundingClientRect())
     // transform hierarchical data
     const root = hierarchy(data);
+    
     // Need to flip width and height when chart is vertical vs. horizontal
     const treeLayout = tree().size([width, height]);
 
@@ -45,48 +51,70 @@ function TreeChart({ data }) {
     // console.warn("descendants", root.descendants());
     // console.warn("links", root.links());
     // Callbacks for events on nodes
-    function toggleChildren(d) {
-      console.log("Source object is ", d);
+    function toggleChildren(d, i, nodes) {
       /** Toggles children on click to open/close */
+      // setPreviousNodes(root.descendants())
+      // case 1: children are showing and we want to hide them
       if (d.children) {
       d.data._children = d.data.children;
       d.data.children = null;
-      } else {
+      // setNodesRemoved(hierarchy(d.data._children).descendants())
+      }
+      // case 2: children are hidden and we want to show them
+      else {
       d.data.children = d.data._children;
       d.data._children = null;
+      // setNodesAdded(hierarchy(d.data.children).descendants())
       }
-      setNestedStateChange(!nestedStateChange);
+      
+      setNestedStateChange(!nestedStateChange)
     }
-
-    svg.selectAll(".node").on("click", toggleChildren);
-    // nodes
-    var nodes = svg.selectAll("nodes").data(root.descendants());
-    svg
+    // console.log("selection bound to root descendants")
+    // console.log(svg.selectAll(".node").data(root.descendants()))
+    const enteringAndUpdatingNodes = svg
       .selectAll(".node")
       .data(root.descendants())
       .join(enter => enter
         .append("circle")
-        .attr("opacity", 0))
+        .attr("opacity", 0)
+        )
       .attr("transform", currentZoomState)
       .attr("class", "node")
       .attr("cx", node => node.x)
       .attr("cy", node => node.y)
       .attr("r", 20)
-      .attr("z-index", 1)
       .style("fill", function(d) {
         // the (_)children property is stored in the data object of each node
         return d.data._children ? "lightsteelblue" : "#fff"; 
       })
+      .on("click", toggleChildren)
       .transition()
       .duration(500)
-      .delay(node => node.depth * 300)
-      .attr("opacity", 1);
+      .delay(300)
+      .attr("opacity", 1)
+
+    // If any nodes were added, animate them
+    // if (data !== previouslyRenderedData) {
+    //   // console.log("Node Condition triggered")
+    //   enteringAndUpdatingNodes
+    //     .attr("opacity", 0)
+    //     .transition()
+    //     .duration(500)
+    //     .delay(node => node.depth * 300)
+    //     .attr("opacity", 1);
+    // }
+
+    // If any nodes were removed, animate them
+
+    // Clear both nodes added/removed states
 
     // links
     const enteringAndUpdatingLinks = svg
       .selectAll(".link")
       .data(root.links())
-      .join("path")
+      .join(enter => enter
+        .append("path")
+        .attr("opacity", 0))
       .attr("class", "link")
       .attr("transform", currentZoomState)
       .attr("d", linkGenerator)
@@ -94,20 +122,25 @@ function TreeChart({ data }) {
         const length = this.getTotalLength();
         return `${length} ${length}`;
       })
+      .transition()
+      .duration(500)
+      // .delay(link => link.source.depth * 500)
+      .attr("stroke-dashoffset", 0)
       .attr("stroke", "black")
       .attr("fill", "none")
       .attr("opacity", 1);
 
-    if (data !== previouslyRenderedData) {
-      enteringAndUpdatingLinks
-        .attr("stroke-dashoffset", function() {
-          return this.getTotalLength();
-        })
-        .transition()
-        .duration(500)
-        .delay(link => link.source.depth * 500)
-        .attr("stroke-dashoffset", 0);
-    }
+    // if (data === previouslyRenderedData) {
+    //   // console.log("Link condition triggered")
+    //   enteringAndUpdatingLinks
+    //     .attr("stroke-dashoffset", function() {
+    //       return this.getTotalLength();
+    //     })
+    //     .transition()
+    //     .duration(500)
+    //     .delay(link => link.source.depth * 500)
+    //     .attr("stroke-dashoffset", 0);
+    // }
 
     // labels
     svg
@@ -116,7 +149,7 @@ function TreeChart({ data }) {
       .join(enter => enter
         .append("text")
         .attr("opacity", 0))
-        .attr("transform", currentZoomState)  // the zoom state should be applied to all entering elements
+      .attr("transform", currentZoomState)  // the zoom state should be applied to all entering elements
       .attr("class", "label")
       .attr("x", node => node.x*0.9)
       .attr("y", node => node.y*1.1)
@@ -125,7 +158,7 @@ function TreeChart({ data }) {
       .text(node => node.data.name)
       .transition()
       .duration(500)
-      .delay(node => 300)
+      .delay(300)
       .attr("opacity", 1);
 
     function zoomed() {
@@ -138,8 +171,11 @@ function TreeChart({ data }) {
     }
     const zoom1 = zoom().on("zoom", zoomed);;
     svg.call(zoom1)
-    console.log("data was", data)
-  }, [data, dimensions, currentZoomState, previouslyRenderedData, nestedStateChange]);
+  }, [data,
+      dimensions,
+      currentZoomState,
+      // previouslyRenderedData,
+      nestedStateChange]);
   // ^ When dimensions change (which will happen whenever a resize occurs), the svg drawings
   // will re-render with new dimensions.
   return (

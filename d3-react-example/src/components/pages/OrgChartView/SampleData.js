@@ -3,7 +3,7 @@ const initialData = {
     children: [
       {
         name: "🙂",
-        children: [
+        _children: [
           {
             name: "😀",
             _children: [
