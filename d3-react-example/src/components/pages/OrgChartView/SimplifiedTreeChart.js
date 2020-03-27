@@ -6,7 +6,7 @@ import useResizeObserver from "./useResizeObserver";
 // array changes but NOT on initial render.
 import useDidMountEffect from "./useDidMountEffect";
 
-function SimpleTreeChart({ data }) {
+function SimpleTreeChart({ data, setData }) {
   const svgRef = useRef();  // hold reference to the SVG element that d3 will render its content into
   const wrapperRef = useRef();  // hold reference to the div element that contains the svg (used for resizing)
   const dimensions = useResizeObserver(wrapperRef);  // dimensions will change on window resize
@@ -52,7 +52,8 @@ function SimpleTreeChart({ data }) {
     
    
     // Get the root node from JSON using d3's hierarchy method
-    const root = hierarchy(data);
+    // const root = hierarchy(data);
+    const root = data
     // Set initial position of the root
     root.x0 = width/2;
     root.y0 = 0;
@@ -72,8 +73,8 @@ function SimpleTreeChart({ data }) {
         treeLayout(root)
         // Get the nodes and links (edges) of the subtree rooted at root.
         const nodes = root.descendants(), links = root.links();
-        // Normalize for fixed-depth.
-        nodes.forEach(function(d) { d.y = d.depth * 180; });
+        // Normalize for fixed-depth; also need to shift the nodes down
+        nodes.forEach(function(d) { d.y = d.depth * 180 + height*0.10; });
         // Update the nodes; start by storing a selector for all elements bound to the nodes array.
         const node = svg.select("#parentContainer").selectAll("g.node")
           .data(nodes, function(d) { return d.id || (d.id = ++i); })
@@ -196,8 +197,8 @@ const wrapperStyles = {
   background: "#eee",
   // TODO: this height difference needs to be recalculated when the header/banner/footer are resized responsively
   // height calculation: 100% height - 5% height (footer) - 7.5% height (header) - 2.5% height (beta banner)
-  height: "85%",
-  width: "80%" 
+  height: "100%",
+  width: "100%" 
 }
 
 export default SimpleTreeChart;

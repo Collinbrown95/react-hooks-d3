@@ -1,4 +1,6 @@
-const treeData = {
+import { hierarchy } from "d3";
+
+var treeData = {
     "name": "Top Level",
     "parent": "null",
     "children": [
@@ -22,5 +24,9 @@ const treeData = {
     }
     ]
 };
+
+// d3 interacts with a Node prototype of the original data instead of interacting with the
+// original data directly.
+treeData = hierarchy(treeData);
 
 export default treeData;

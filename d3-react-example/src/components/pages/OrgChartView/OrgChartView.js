@@ -11,14 +11,27 @@ function OrgChartView() {
     const [data, setData] = useState(treeData);
     return (
         <React.Fragment>
+            <div style={simpleLayout}>
+                <SimpleTreeChart
+                data={data}
+                setData={setData}/>
+                <button onClick={function(){
+                    console.log("component's data is");
+                    console.log(data);
+                }}>I am button</button>
+            </div>
             {/* <TreeChart
             data={initialData}
-            setData={setData}/> */}
-            <SimpleTreeChart
-            data={treeData}
-            setData={setData}/>
+            setData={setData}/> */}     
         </React.Fragment>
     )
+}
+
+const simpleLayout = {
+    display: "flex",
+    flexDirection: "row",
+    height: "90%",
+    width: "80%"
 }
 
 export default OrgChartView;

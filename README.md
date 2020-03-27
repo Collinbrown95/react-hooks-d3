@@ -1,6 +1,12 @@
 # react-hooks-d3
 > Simple examples that illustrate the integration of d3.js into React with React hooks
 
+## High Level Overview
+Note: this is just one candidate setup to integrate React with d3.
+
+- The functional component ```OrgChartView``` holds state hooks for the original hierarchical data and the d3 ```Node``` prototype of the same data that gets copied when calling ```d3.hierarchy(data)```. The reason for this is to preserve the original data, but also keep a copy of the prototype so that the state of the tree chart can be preserved when the visualization re-renders from resizing the screen.
+- 
+
 ## D3 and React - general information
 - General update pattern of d3 is to select elements, map and synchronize those elements to data, and define handlers for what should happen to the svgs when data are entered, updated, or exited.
 
