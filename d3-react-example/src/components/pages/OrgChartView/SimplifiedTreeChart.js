@@ -53,6 +53,7 @@ function SimpleTreeChart({ data, setData }) {
    
     // Get the root node from JSON using d3's hierarchy method
     // const root = hierarchy(data);
+    // TODO: set all children below depth of 2 to _children so they are hidden on initial render.
     const root = data
     // Set initial position of the root
     root.x0 = width/2;
@@ -60,8 +61,6 @@ function SimpleTreeChart({ data, setData }) {
     // Call update on the root
     update(root);
 
-    // TODO: check if i can be moved safely to the SimpleTreeChart scope so that it does not need to be passed
-    // as an argument to update.
     /**
      * 
      * @param {*} source 

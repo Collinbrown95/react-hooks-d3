@@ -7,8 +7,8 @@ import initialData from './SampleData';
 import treeData from './SimpleSampleData';
 
 function OrgChartView() {
-    // const [data, setData] = useState(initialData);
-    const [data, setData] = useState(treeData);
+    const [data, setData] = useState(initialData);
+    // const [data, setData] = useState(treeData);
     return (
         <React.Fragment>
             <div style={simpleLayout}>

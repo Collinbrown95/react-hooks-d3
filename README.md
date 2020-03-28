@@ -1,6 +1,9 @@
 # react-hooks-d3
 > Simple examples that illustrate the integration of d3.js into React with React hooks
 
+## TODO:
+1. The ```hierarchy(data)``` method does not recognize the ```_children``` (i.e. hidden children) property by default. Need to find a way to parse the entire hierarchical data structure, and then apply the hidden label to those below the first level.
+
 ## High Level Overview
 Note: this is just one candidate setup to integrate React with d3.
 
@@ -44,8 +47,19 @@ data = {
 - When nodes enter, they are given the class ```node```.
 
 - ```d``` attribute for links is handled by the ```linkGenerator``` to draw the links between nodes
+  
+
 __Sources__
 
 1. This [YouTube playlist](https://www.youtube.com/watch?v=Y-ThTzB-Zjk&list=PLDZ4p-ENjbiPo4WH7KdHjh_EMI7Ic8b2B&index=20)
 2. [D3 zoom - the missing manual](https://www.freecodecamp.org/news/get-ready-to-zoom-and-pan-like-a-pro-after-reading-this-in-depth-tutorial-5d963b0a153e/)
 3. https://www.d3indepth.com/enterexit/
+4. https://coderwall.com/p/psogia/simplest-way-to-add-zoom-pan-on-d3-js
+5. https://medium.com/@jeffbutsch/using-d3-in-react-with-hooks-4a6c61f1d102
+6. [React effect hooks documentation](https://reactjs.org/docs/hooks-effect.html) and [post on multiple effect hooks](https://stackoverflow.com/questions/54002792/should-i-use-one-or-many-useeffect-in-component) https://reactjs.org/docs/hooks-rules.html
+7. https://stackoverflow.com/questions/47392549/how-to-update-data-in-d3-version-4 <-- change in update pattern from v3 to v4
+8. https://bost.ocks.org/mike/transition/ transitions documentation, https://bost.ocks.org/mike/selection/ selection documentation
+9. https://www.tutorialspoint.com/d3js/d3js_svg_transformation.htm d3 tutorial on svg transformations
+10. https://stackoverflow.com/questions/53253940/make-react-useeffect-hook-not-run-on-initial-render/53254028#53254028 toggling useEffect hook on initial render vs. subsequent renders, https://stackoverflow.com/questions/53253940/make-react-useeffect-hook-not-run-on-initial-render also related
+11. https://www.d3indepth.com/enterexit/ enter update exit pattern in d3
+12. 
