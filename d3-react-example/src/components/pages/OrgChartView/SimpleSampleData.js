@@ -1,5 +1,7 @@
 import { hierarchy } from "d3";
 
+import collapse from "../../utilities/d3-utilities.js";
+
 var treeData = {
     "name": "Top Level",
     "parent": "null",
@@ -28,5 +30,8 @@ var treeData = {
 // d3 interacts with a Node prototype of the original data instead of interacting with the
 // original data directly.
 treeData = hierarchy(treeData);
+
+// Collapse all child nodes of the tree
+treeData.children.forEach(collapse);
 
 export default treeData;

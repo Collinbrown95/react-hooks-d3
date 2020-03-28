@@ -1,5 +1,7 @@
 import { hierarchy } from "d3";
 
+import collapse from "../../utilities/d3-utilities.js";
+
 var initialData = {
     "name": "😐",
     "children": [
@@ -64,5 +66,7 @@ var initialData = {
   };
 
 initialData = hierarchy(initialData)
+
+initialData.children.forEach(collapse)
 
 export default initialData;

@@ -57,7 +57,7 @@ export const OptionsLink = styled(Link)`
     display: flex;
     justify-content: space-evenly;
     align-items: center;
-    font-weight: 400;
+    font-weight: 300;
     color: #000;
     text-decoration: none;
     margin: 0% 2% 0%;

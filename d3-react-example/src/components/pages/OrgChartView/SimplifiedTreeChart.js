@@ -2,6 +2,11 @@ import React, { useRef, useEffect, useState } from "react";
 import { select, hierarchy, tree, linkVertical, zoom, zoomTransform } from "d3";
 import useResizeObserver from "./useResizeObserver";
 
+import {
+  spaceNodesEvenly,
+  staggerText,
+} from "../../utilities/d3-utilities";
+
 // useDidMountEffect lets you specify a useEffect hook that fires if anything in the dependency
 // array changes but NOT on initial render.
 import useDidMountEffect from "./useDidMountEffect";
@@ -23,7 +28,7 @@ function SimpleTreeChart({ data, setData }) {
   // Hold a reference to the SVG returned by this component (i.e. the one referenced by svgRef). Append
   // a group tag and offset it by the margins.
   const svg = select(svgRef.current)
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    // .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
   // Apply zoom handling to the parent container group.
   svg
     .call(
@@ -77,7 +82,11 @@ function SimpleTreeChart({ data, setData }) {
         // Update the nodes; start by storing a selector for all elements bound to the nodes array.
         const node = svg.select("#parentContainer").selectAll("g.node")
           .data(nodes, function(d) { return d.id || (d.id = ++i); })
-
+        // Spread out the nodes based on how many siblings there are (only apply this if we are expanding a node; if a node
+        // is collapsing, its children property will be null)
+        if (source.children) {
+          source.children.forEach(spaceNodesEvenly);
+        }
         // Enter new nodes at the parent's previous position
         const nodeEnter = node.enter().append("g")
         .attr("class", "node")
@@ -92,9 +101,12 @@ function SimpleTreeChart({ data, setData }) {
             return d._children ? "lightsteelblue" : "#fff"; });
         // Append the text in the name field to each node (TODO: this should respond to the treechart layout in a more sophisticated way)
         nodeEnter.append("text")
-        .attr("x", function(d) { return d.children || d._children ? -13 : 13; })
-        .attr("dy", ".35em")
-        .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+        .attr("y", staggerText)
+        .attr("dy", ".20em")
+        .attr("text-anchor", function(d) {
+          // Stagger labels based on odd/even
+          return d.id % 2 == 0 ? "end" : "end"; 
+        })
         .text(function(d) {
             return d.data.name; 
         })
@@ -166,6 +178,7 @@ function SimpleTreeChart({ data, setData }) {
      * @param {*} d TODO
      */
     function click(d) {
+      console.log("NEW CLICK")
         if (d.children) {
         d._children = d.children;
         d.children = null;
