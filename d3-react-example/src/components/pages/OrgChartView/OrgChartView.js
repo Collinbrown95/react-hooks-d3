@@ -14,9 +14,14 @@ import initialData from './SampleData';
 import treeData from './SimpleSampleData';
 import largeTreeData from './treeWithSize';
 import largeTreeDiagram from "./treeWithSize";
+import NodeToolTip from "./NodeToolTip";
 
 function OrgChartView() {
+    // State variable for the tree data
     const [data, setData] = useState(largeTreeDiagram);
+    // State variable to hold whether or not a node was hovered over
+    const [hoveredNode, setHoveredNode] = useState();
+    const [scales, setScales] = useState();
     // const [data, setData] = useState(initialData);
     // const [data, setData] = useState(treeData);
     return (
@@ -24,8 +29,15 @@ function OrgChartView() {
             <SimpleTreeChart
               data={data}
               setData={setData}
+              setHoveredNode={setHoveredNode}
+              setScales={setScales}
             />
             <ChartController/>
+            {hoveredNode ? 
+            <NodeToolTip
+              hoveredNode={hoveredNode}
+              scales={scales}
+            /> : null}
         </div>  
     )
 }

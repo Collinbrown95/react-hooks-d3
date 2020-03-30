@@ -3,15 +3,21 @@ import { select, hierarchy, tree, linkVertical, zoom, zoomTransform } from "d3";
 import useResizeObserver from "./useResizeObserver";
 
 import {
-  spaceNodesEvenly,
+  generateNodeSize,
+  generateTextSize,
+  nodeSeparation,
   staggerText,
 } from "../../utilities/d3-utilities";
+
+import {
+  presentToolTip,
+} from "../../utilities/org-chart-utilities";
 
 // useDidMountEffect lets you specify a useEffect hook that fires if anything in the dependency
 // array changes but NOT on initial render.
 import useDidMountEffect from "./useDidMountEffect";
 
-function SimpleTreeChart({ data, setData }) {
+function SimpleTreeChart({ data, setData, setHoveredNode, setScales}) {
   const svgRef = useRef();  // hold reference to the SVG element that d3 will render its content into
   const wrapperRef = useRef();  // hold reference to the div element that contains the svg (used for resizing)
   const dimensions = useResizeObserver(wrapperRef);  // dimensions will change on window resize
@@ -43,7 +49,7 @@ function SimpleTreeChart({ data, setData }) {
    * The hand-off point between react and d3 is here; we let d3 take control of the updating pattern inside
    * of the useEffect hook.
    */
-  useEffect(() => {
+  useDidMountEffect(() => {
     // Get width and height of the tree based on the window size/size of bounding rectangle.
     var { width, height } = dimensions || wrapperRef.current.getBoundingClientRect();
     // Apply margins to the initial height and width (TODO: dynamically pick margins to fit window size)
@@ -52,8 +58,15 @@ function SimpleTreeChart({ data, setData }) {
     // Variables to hold animation duration and node counter
     var i=0;
     
-    // Create the tree layout
-    const treeLayout = tree().size([width, height]);
+    // Create the tree layout; this should resize dynamically
+    // Note: when setting nodeSize instead of size (they are mutually exclusive; one overrides the other),
+    // the root node is anchored at coordinate (0,0) by default.
+    console.log("layout is ", generateNodeSize(width, height));
+    const treeLayout = tree()
+      .nodeSize(generateNodeSize(width, height))
+      .separation(nodeSeparation);
+
+
     
    
     // Get the root node from JSON using d3's hierarchy method
@@ -77,21 +90,20 @@ function SimpleTreeChart({ data, setData }) {
         treeLayout(root)
         // Get the nodes and links (edges) of the subtree rooted at root.
         const nodes = root.descendants(), links = root.links();
-        // Normalize for fixed-depth; also need to shift the nodes down
-        nodes.forEach(function(d) { d.y = d.depth * 180 + height*0.10; });
+        // Translate each x coordinate so that it is centered with respect to the svg
+        nodes.forEach(function(d) {
+          // When using nodeSize, the root is anchored at (0,0), so we need to shift all x coords by width/2
+          d.x = d.x + (width + margin.left + margin.right)/2;
+          // Normalize for fixed-depth; also need to shift the nodes down
+          d.y = d.depth * 180 + height*0.10;
+        });
         // Update the nodes; start by storing a selector for all elements bound to the nodes array.
         const node = svg.select("#parentContainer").selectAll("g.node")
           .data(nodes, function(d) { return d.id || (d.id = ++i); })
-        // Spread out the nodes based on how many siblings there are (only apply this if we are expanding a node; if a node
-        // is collapsing, its children property will be null)
-        if (source.children) {
-          source.children.forEach(spaceNodesEvenly);
-        }
         // Enter new nodes at the parent's previous position
         const nodeEnter = node.enter().append("g")
         .attr("class", "node")
         .attr("transform", function(d) { return "translate(" + source.x0 + "," + source.y0 + ")"; })
-        .on("click", click)
         // Append a circle SVG to the set of entering elements. Node that each element of nodeEnter is its own group
         // container that will hold a circle and a text element.
         nodeEnter.append("circle")
@@ -101,11 +113,13 @@ function SimpleTreeChart({ data, setData }) {
             return d._children ? "lightsteelblue" : "#fff"; });
         // Append the text in the name field to each node (TODO: this should respond to the treechart layout in a more sophisticated way)
         nodeEnter.append("text")
+          // .on("click", onMouseOverNode)
+          // .on("click", onMouseOutNode)
         .attr("y", staggerText)
         .attr("dy", ".20em")
         .attr("text-anchor", function(d) {
           // Stagger labels based on odd/even
-          return d.id % 2 == 0 ? "end" : "end"; 
+          return d.id % 2 == 0 ? "middle" : "middle"; 
         })
         .text(function(d) {
             return d.data.name; 
@@ -114,18 +128,29 @@ function SimpleTreeChart({ data, setData }) {
         
         // Apply a transition to all updating nodes. All entering nodes have been set up so that the transition will
         // animate them to their desired position; all existing nodes will remain in place.
-        const nodeUpdate = nodeEnter.merge(node).transition()
-        .duration(duration)
-        // All entering nodes are initialized at the position of their parent (root is initialized at its own position),
-        // so this transformation translates them from (x0, y0) to (x, y) in `duration` amount of time.
-        .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+        const nodeUpdate = nodeEnter.merge(node)
+         
+        nodeUpdate
+          .transition()
+          .duration(duration)
+          // All entering nodes are initialized at the position of their parent (root is initialized at its own position),
+          // so this transformation translates them from (x0, y0) to (x, y) in `duration` amount of time.
+          .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
         // Once the transition is complete, the set of circles in the updating group should arrive at the below final state.
         nodeUpdate.select("circle")
-        .attr("r", 10)
-        .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+          .on("click", click)
+          .on("mouseover", function(d, i, nodes){
+            setScales({xScale: d.x, yScale: d.y});
+            setHoveredNode(d);
+          })
+          .attr("r", 15)
+          .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
         // Once the transition is complete, the set of text elements in the updating group should arrive at the below final state.
         nodeUpdate.select("text")
-        .style("fill-opacity", 1);
+          .style("font-size", "18px")
+          .style("fill-opacity", 1);
+
+
         // Apply transition to the exiting nodes.
         const nodeExit = node.exit().transition()
           .duration(duration)
@@ -146,12 +171,15 @@ function SimpleTreeChart({ data, setData }) {
         // a path element; all path elements will be inserted before the subsequent group elements. These links
         // will enter at their parent's previous position
         const linkEnter = link.enter().insert("path", "g")
+          .attr("id", function(d) {
+            return "target" + d.target.id.toString()
+          })
           .attr("class", "link")
-	      .attr("d", function(d) {
+	        .attr("d", function(d) {
             var o = {x: source.x0, y: source.y0};
-		    return linkGenerator({source: o, target: o});
+		        return linkGenerator({source: o, target: o});
           });
-        
+        console.log("links are ", linkEnter)
         // Transition the links to their new position
         linkEnter.merge(link).transition()
 	      .duration(duration)
