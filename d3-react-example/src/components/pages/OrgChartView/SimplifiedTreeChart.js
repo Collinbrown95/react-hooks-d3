@@ -12,6 +12,7 @@ import {
 import {
   presentToolTip,
   hideToolTip,
+  hideToolTipInstant,
 } from "../../utilities/org-chart-utilities";
 
 import NodeToolTip from "./NodeToolTip";
@@ -139,7 +140,11 @@ function SimpleTreeChart({
         const nodeUpdate = nodeEnter.merge(node)
           .on("mouseover", function(d, i, nodes){
             // we only want to run this callback if the node does not have the class "entering" or "exiting".
-            if ((!d3.select(this).classed("entering")) && (!d3.select(this).classed("exiting"))) {
+            if (
+              (!d3.select(this).classed("entering")) && 
+              (!d3.select(this).classed("exiting")) &&
+              (!d3.select(this).classed("expanding"))
+              ) {
               setScales({xScale: d.x, yScale: d.y});
               setHoveredNode(d);
               presentToolTip(d, i, nodes);
@@ -154,6 +159,9 @@ function SimpleTreeChart({
           // so this transformation translates them from (x0, y0) to (x, y) in `duration` amount of time.
           .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
           .on("end", function() {
+            // When the transitions are done, need to (1) set the expanding flag on the clicked node to false, and (2) set the
+            // entering class on the new nodes to false.
+            d3.selectAll(".expanding").classed("expanding", false);
             d3.select(this).classed("entering", false);
           });
         // Once the transition is complete, the set of circles in the updating group should arrive at the below final state.
@@ -226,17 +234,18 @@ function SimpleTreeChart({
      * @param {*} d TODO
      */
     function click(d) {
-      // console.log("NEW CLICK")
-      hideToolTip()
-        if (d.children) {
-        d._children = d.children;
-        d.children = null;
-        } else {
-        d.children = d._children;
-        d._children = null;
-        }
-        update(d);
-        // update(root);
+      // Label the clicked node as "expanding" so it doesn't interfere with the tooltip animation
+      d3.select(this.parentNode).classed("expanding", true)
+      hideToolTipInstant()
+      if (d.children) {
+      d._children = d.children;
+      d.children = null;
+      } else {
+      d.children = d._children;
+      d._children = null;
+      }
+      update(d);
+      // update(root);
     }
   }, [dimensions]);
 //    [dimensions,

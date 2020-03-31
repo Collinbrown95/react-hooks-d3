@@ -33,7 +33,7 @@ function OrgChartView() {
               scales={scales}
               setScales={setScales}
             />
-            <ChartController/>
+            <ChartController />
         </div>  
     )
 }
@@ -41,7 +41,7 @@ function OrgChartView() {
 const simpleLayout = {
     display: "flex",
     flexDirection: "row",
-    height: "84.5%",
+    height: "87.5%",
     width: "100%"
 }
 

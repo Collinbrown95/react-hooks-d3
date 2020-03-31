@@ -20,7 +20,7 @@ export const d3ViewContainer = styled.div`
 //     height: 100%;
 
 export const ControlsDiv = styled.div`
-    border: 1px solid blue;
+    /* border: 1px solid blue;*/
     background: #282828;
     width: 25%;
     height: 100%;

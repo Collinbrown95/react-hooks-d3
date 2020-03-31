@@ -7,8 +7,8 @@ export const HeaderContainer = styled.header`
     flex-direction: row;
     justify-content: space-between;
     height: 5%;
-    background: #eceff1;
-    border-bottom: 1px solid #cfd8dc;
+    background: #eee;
+    border-bottom: 0.5px solid #cfd8dc;
     color: #000;
     text-align: center;
     padding: 0% 2%;
@@ -22,6 +22,8 @@ export const AcronymLogo = styled.div`
     display: flex;
     flex-direction: row;
     flex: 3;
+    justify-content: flex-start;
+    align-items: center;
     @media screen and (max-width: 1400px) and (min-width: 801px) {
         flex: 5;
     }
@@ -33,6 +35,8 @@ export const AcronymLogo = styled.div`
 export const Title = styled.h1`
     font-weight: 200;
     font-size: 28px;
+    margin-left: 5%;
+    margin-bottom: 0;
     @media screen and (max-width: 800px) {
         display: none;   
     }
@@ -41,8 +45,8 @@ export const Title = styled.h1`
 export const OptionsContainer = styled.div`
     display: flex;
     flex-direction: row;
-    justify-content: flex-start;
-    flex: 10;
+    justify-content: space-evenly;
+    flex: 5;
     width: 50%;
     @media screen and (max-width: 1400px) and (min-width: 801px) {
         justify-content: center;
