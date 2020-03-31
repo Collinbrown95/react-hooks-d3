@@ -14,7 +14,6 @@ import initialData from './SampleData';
 import treeData from './SimpleSampleData';
 import largeTreeData from './treeWithSize';
 import largeTreeDiagram from "./treeWithSize";
-import NodeToolTip from "./NodeToolTip";
 
 function OrgChartView() {
     // State variable for the tree data
@@ -29,15 +28,12 @@ function OrgChartView() {
             <SimpleTreeChart
               data={data}
               setData={setData}
+              hoveredNode={hoveredNode}
               setHoveredNode={setHoveredNode}
+              scales={scales}
               setScales={setScales}
             />
             <ChartController/>
-            {hoveredNode ? 
-            <NodeToolTip
-              hoveredNode={hoveredNode}
-              scales={scales}
-            /> : null}
         </div>  
     )
 }

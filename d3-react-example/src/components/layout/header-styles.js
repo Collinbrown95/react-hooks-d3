@@ -6,7 +6,7 @@ export const HeaderContainer = styled.header`
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    height: 7.5%;
+    height: 5%;
     background: #eceff1;
     border-bottom: 1px solid #cfd8dc;
     color: #000;
@@ -32,7 +32,7 @@ export const AcronymLogo = styled.div`
 
 export const Title = styled.h1`
     font-weight: 200;
-    margin-left: 2.5%;
+    font-size: 28px;
     @media screen and (max-width: 800px) {
         display: none;   
     }

@@ -13,11 +13,16 @@ import {
   presentToolTip,
 } from "../../utilities/org-chart-utilities";
 
+import NodeToolTip from "./NodeToolTip";
 // useDidMountEffect lets you specify a useEffect hook that fires if anything in the dependency
 // array changes but NOT on initial render.
 import useDidMountEffect from "./useDidMountEffect";
 
-function SimpleTreeChart({ data, setData, setHoveredNode, setScales}) {
+function SimpleTreeChart({
+  data, setData,
+  hoveredNode, setHoveredNode,
+  scales, setScales
+}) {
   const svgRef = useRef();  // hold reference to the SVG element that d3 will render its content into
   const wrapperRef = useRef();  // hold reference to the div element that contains the svg (used for resizing)
   const dimensions = useResizeObserver(wrapperRef);  // dimensions will change on window resize
@@ -143,6 +148,10 @@ function SimpleTreeChart({ data, setData, setHoveredNode, setScales}) {
             setScales({xScale: d.x, yScale: d.y});
             setHoveredNode(d);
           })
+          .on("mouseout", function(d, i, nodes){
+            setScales({xScale: null, yScale: null});
+            setHoveredNode(null);
+          })
           .attr("r", 15)
           .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
         // Once the transition is complete, the set of text elements in the updating group should arrive at the below final state.
@@ -227,7 +236,13 @@ function SimpleTreeChart({ data, setData, setHoveredNode, setScales}) {
   return (
     <div ref={wrapperRef} style={wrapperStyles}>
       <svg ref={svgRef}>
-          <g id="parentContainer"></g>
+          <g id="parentContainer">
+            {hoveredNode ? 
+              <NodeToolTip
+                hoveredNode={hoveredNode}
+                scales={scales}
+              /> : null}
+          </g>
       </svg>
     </div>
   );

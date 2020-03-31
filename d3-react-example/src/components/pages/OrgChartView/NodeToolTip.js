@@ -10,30 +10,31 @@ function NodeToolTip({hoveredNode, scales}) {
     console.log("hovered node is ", hoveredNode)
     
     const styles = {
-      left: `${xScale - 30}px`,
-      top: `${yScale}px`
+      x: xScale  - 80,
+      y: yScale - 30,
+      width: 50,
+      height: 50,
+      backgroundColor: "#282828",
+      color: "#fff",
+      transition: "opacity 0.5s",
+      opacity: 1
     }
-  
+
+    const divStyles = {
+      backgroundColor: "#282828",
+      color: "#fff",
+    }
+  // The <foreignObject> SVG element includes elements from a different XML namespace. In the context of a browser, it is most likely (X)HTML.
     return (
-      <div className="Tooltip" style={styles}>
-        <table>
-          <thead>
-            <tr>
-              <th colSpan="2">{hoveredNode.title}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td colSpan="1">Bodies</td>
-              <td colSpan="1">{hoveredNode.value}</td>
-            </tr>
-            <tr>
-              <td colSpan="1">Year</td>
-              <td colSpan="1">{hoveredNode.year}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <foreignObject style={styles}>
+        <div styles={divStyles} xmlns="http://www.w3.org/1999/xhtml">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+          Sed mollis mollis mi ut ultricies. Nullam magna ipsum,
+          porta vel dui convallis, rutrum imperdiet eros. Aliquam
+          erat volutpat.
+        </div>
+      </foreignObject>
+      
     )
 }
 
