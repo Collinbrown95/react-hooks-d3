@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import { select, hierarchy, tree, linkVertical, zoom, zoomTransform } from "d3";
 import useResizeObserver from "./useResizeObserver";
-
+import * as d3 from "d3";
 import {
   generateNodeSize,
   generateTextSize,
@@ -11,6 +11,7 @@ import {
 
 import {
   presentToolTip,
+  hideToolTip,
 } from "../../utilities/org-chart-utilities";
 
 import NodeToolTip from "./NodeToolTip";
@@ -66,7 +67,7 @@ function SimpleTreeChart({
     // Create the tree layout; this should resize dynamically
     // Note: when setting nodeSize instead of size (they are mutually exclusive; one overrides the other),
     // the root node is anchored at coordinate (0,0) by default.
-    console.log("layout is ", generateNodeSize(width, height));
+    // console.log("layout is ", generateNodeSize(width, height));
     const treeLayout = tree()
       .nodeSize(generateNodeSize(width, height))
       .separation(nodeSeparation);
@@ -108,6 +109,8 @@ function SimpleTreeChart({
         // Enter new nodes at the parent's previous position
         const nodeEnter = node.enter().append("g")
         .attr("class", "node")
+        // Add an "entering" class so we can prevent these nodes from having the mouseover callback applied while they are animating in.
+        .classed("entering", true)
         .attr("transform", function(d) { return "translate(" + source.x0 + "," + source.y0 + ")"; })
         // Append a circle SVG to the set of entering elements. Node that each element of nodeEnter is its own group
         // container that will hold a circle and a text element.
@@ -134,24 +137,28 @@ function SimpleTreeChart({
         // Apply a transition to all updating nodes. All entering nodes have been set up so that the transition will
         // animate them to their desired position; all existing nodes will remain in place.
         const nodeUpdate = nodeEnter.merge(node)
-         
+          .on("mouseover", function(d, i, nodes){
+            // we only want to run this callback if the node does not have the class "entering" or "exiting".
+            if ((!d3.select(this).classed("entering")) && (!d3.select(this).classed("exiting"))) {
+              setScales({xScale: d.x, yScale: d.y});
+              setHoveredNode(d);
+              presentToolTip(d, i, nodes);
+            }
+          })
+          .on("mouseout", hideToolTip);
+
         nodeUpdate
           .transition()
           .duration(duration)
           // All entering nodes are initialized at the position of their parent (root is initialized at its own position),
           // so this transformation translates them from (x0, y0) to (x, y) in `duration` amount of time.
-          .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+          .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+          .on("end", function() {
+            d3.select(this).classed("entering", false);
+          });
         // Once the transition is complete, the set of circles in the updating group should arrive at the below final state.
         nodeUpdate.select("circle")
           .on("click", click)
-          .on("mouseover", function(d, i, nodes){
-            setScales({xScale: d.x, yScale: d.y});
-            setHoveredNode(d);
-          })
-          .on("mouseout", function(d, i, nodes){
-            setScales({xScale: null, yScale: null});
-            setHoveredNode(null);
-          })
           .attr("r", 15)
           .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
         // Once the transition is complete, the set of text elements in the updating group should arrive at the below final state.
@@ -161,7 +168,11 @@ function SimpleTreeChart({
 
 
         // Apply transition to the exiting nodes.
-        const nodeExit = node.exit().transition()
+        const nodeExit = node.exit()
+          // Apply an exiting class so that mouseover events cannot fire while the node is exiting. These nodes are all removed from
+          // the DOM, so no need to remove exiting class.
+          .classed("exiting", true)
+          .transition()
           .duration(duration)
           .attr("transform", function(d) { return "translate(" + source.x + "," + source.y + ")"; })
           .remove();
@@ -188,7 +199,7 @@ function SimpleTreeChart({
             var o = {x: source.x0, y: source.y0};
 		        return linkGenerator({source: o, target: o});
           });
-        console.log("links are ", linkEnter)
+        // console.log("links are ", linkEnter)
         // Transition the links to their new position
         linkEnter.merge(link).transition()
 	      .duration(duration)
@@ -215,7 +226,8 @@ function SimpleTreeChart({
      * @param {*} d TODO
      */
     function click(d) {
-      console.log("NEW CLICK")
+      // console.log("NEW CLICK")
+      hideToolTip()
         if (d.children) {
         d._children = d.children;
         d.children = null;
@@ -237,11 +249,12 @@ function SimpleTreeChart({
     <div ref={wrapperRef} style={wrapperStyles}>
       <svg ref={svgRef}>
           <g id="parentContainer">
-            {hoveredNode ? 
+            {/* {hoveredNode ?  */}
               <NodeToolTip
                 hoveredNode={hoveredNode}
                 scales={scales}
-              /> : null}
+              /> 
+              {/* : null} */}
           </g>
       </svg>
     </div>
