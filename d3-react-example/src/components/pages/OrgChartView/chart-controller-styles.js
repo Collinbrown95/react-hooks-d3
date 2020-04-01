@@ -20,8 +20,10 @@ import FontAwesome from 'react-fontawesome';
     justify-content: space-between;
     align-items: center;
 
+    padding: 0.5% 0%;
+
     background: #fff;
-    border-radius: 0.5px;
+    border-radius: 1.5px;
     
     border-bottom: 0.5px solid rgba(41, 41, 41, 0.5);
 `;
@@ -82,7 +84,7 @@ export const DropDownListItem = styled.li`
 
     font-weight: 300;
     font-size: 14px;
-    text-indent: 5%;
+    text-indent: 2.5%;
 
     border-bottom: 0.25px solid rgba(41, 41, 41, 0.5);
 
@@ -128,18 +130,18 @@ export const FormStyle = styled.form`
 
 export const SearchBarStyle = styled.input`
     flex: 10;
-    font-weight: 400;
+    font-weight: 300;
 
     padding-left: 2.5%;
 
     border: 1px solid #282828;
-    border-radius: 0.5px;
+    border-radius: 2px;
     outline: none;
     color: #282828;
 
     ::placeholder,
     ::-webkit-input-placeholder {
-        font-weight: 400;
+        font-weight: 300;
 
         color: rgba(41, 41, 41, 0.5);
     }
@@ -160,7 +162,8 @@ export const SubmitButtonStyle = styled.button`
     text-align: center;
     
     border: 1px solid #282828;
-    background: #fff;
+    border-radius: 2px;
+    background: "#fff";
     color: #282828;
 
     outline: none;
@@ -179,5 +182,37 @@ export const SubmitButtonStyle = styled.button`
  */
 
 export const ButtonGroupDiv = styled.div`
+    margin-top: 5%;    
+
+    display: flex;
+    flex-direction: row;
+    
+    border: 1px solid #fff;
+    border-radius: 2px;
+
+    width: 92.5%;
+
+    
+`;
+
+export const InnerButton = styled.button`
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    flex: 1;
+
+    border: ${props => props.activeButton ? "1px solid #fff": "1px solid #fff"};
+    
+    background: ${props => props.activeButton ? "rgba(41,41,41,0.3)" : "#fff"};
+    color: ${props => props.activeButton ? "#fff" : "#282828"};
+    padding-top: 1%;
+    padding-bottom: 1%;
+    
+    font-weight: 300;
+    font-size: 16px;
+
+    outline: none;
 
 `;

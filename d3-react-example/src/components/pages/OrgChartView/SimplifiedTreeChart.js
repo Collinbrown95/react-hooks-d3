@@ -7,6 +7,7 @@ import {
   generateTextSize,
   nodeSeparation,
   staggerText,
+  dynamicTextSize,
 } from "../../utilities/d3-utilities";
 
 import {
@@ -171,7 +172,7 @@ function SimpleTreeChart({
           .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
         // Once the transition is complete, the set of text elements in the updating group should arrive at the below final state.
         nodeUpdate.select("text")
-          .style("font-size", "18px")
+          .style("font-size", dynamicTextSize)
           .style("fill-opacity", 1);
 
 

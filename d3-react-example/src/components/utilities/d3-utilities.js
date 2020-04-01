@@ -60,5 +60,15 @@ export function staggerText(d) {
     }
 }
 
+/**
+ * Makes the size of the text proportional to the depth of the node being displayed (the reason being
+ * that deeper nodes are more cluttered, hence smaller text makes them more readable)
+ * @param {} d 
+ */
+export function dynamicTextSize(d) {
+    const fontSize = 18 - d.depth;
+    return fontSize.toString() + "px";
+}
+
 
 export default collapse;

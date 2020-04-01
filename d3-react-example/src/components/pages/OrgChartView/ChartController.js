@@ -6,6 +6,7 @@ import {
 
 import DropDown from "./DropDown";
 import SearchBar from "./SearchBar";
+import ButtonGroup from "./ButtonGroup";
 
 import { dropDownOptions } from "./dropDownData";
 
@@ -17,10 +18,12 @@ function ChartController() {
     const [dropDownList, setDropDownList] = useState(dropDownOptions);
     // For search results
     const [searchResult, setSearchResult] = useState();
+    // active button in button group
+    const [activeButton, setActiveButton] = useState("Employees");
 
     useEffect(() => {
         // To verify that state variables updated as expected
-        console.log("new state is ", dropDownList);
+        // console.log("new state is ", activeButton);
     })
 
     const onSearchAcronym = (e) => {
@@ -43,7 +46,12 @@ function ChartController() {
       // Update the dropDownList state
       setDropDownList(temp);
     }
-    
+  
+    const setActiveButtonClick = (e) => {
+      console.log(activeButton)
+      setActiveButton(activeButton === "Employees" ? "BusinessUnits" : "Employees");
+    }
+
     return (
         <ControlsDiv>
             <ControllerTitle>
@@ -57,6 +65,10 @@ function ChartController() {
               title="Dropdown Menu"
               list={dropDownList}
               resetThenSet={resetThenSet}
+            />
+            <ButtonGroup
+              activeButton={activeButton}
+              setActiveButtonClick={setActiveButtonClick}
             />
         </ControlsDiv>
     )
