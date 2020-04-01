@@ -35,6 +35,8 @@ export const ControllerTitle = styled.h1`
     color: #fff;
     font-weight: 200;
     font-size: 32px;
+
+    margin-top: 2%;
 `;
 
 // display: flex;

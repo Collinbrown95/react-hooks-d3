@@ -7,10 +7,12 @@ import FontAwesome from 'react-fontawesome';
  */
 
  export const DropDownWrapper = styled.div`
-    margin-top: 1%;
+    margin: 2% 0%;
     width: 92.5%;
 
     cursor: pointer;
+
+    position: relative;
 `;
 
  export const DropDownHeader = styled.div`
@@ -30,7 +32,7 @@ export const DropDownHeaderTitle = styled.div`
     font-size: 16px;
     font-weight: 300;
 
-    margin-left: 5%;
+    margin-left: 2.5%;
 `;
 
 export const DropDownArrow = styled(FontAwesome)`
@@ -46,11 +48,11 @@ export const DropDownCheck = styled.div`
 
 export const DropDownUnorderedList = styled.ul`
     z-index: 10;
-    position: relative;
+    position: absolute;
     width: 100%;
     background-color: white;
     
-    max-height: 50%;
+    max-height: 500%;
     overflow-y: scroll;
     -webkit-overflow-scrolling: touch;
 
@@ -96,7 +98,86 @@ export const DropDownListItem = styled.li`
     }
 `;
 
-
 /**
  * Search bar styles
  */
+export const SearchBarDiv = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    width: 92.5%;
+    margin: 2% 0%;
+
+    @media screen and (max-width: 1100px) {
+        width: 92.5%;
+        margin: 2% 0%;
+    }
+`;
+
+export const FormStyle = styled.form`
+    width: 100%;
+
+    display: flex;
+    flex-direction: row;
+
+    text-align: center;
+    
+`;
+
+export const SearchBarStyle = styled.input`
+    flex: 10;
+    font-weight: 400;
+
+    padding-left: 2.5%;
+
+    border: 1px solid #282828;
+    border-radius: 0.5px;
+    outline: none;
+    color: #282828;
+
+    ::placeholder,
+    ::-webkit-input-placeholder {
+        font-weight: 400;
+
+        color: rgba(41, 41, 41, 0.5);
+    }
+    :-ms-input-placeholder {
+        font-weight: 400;
+
+        color: rgba(41, 41, 41, 0.5);
+    }
+    @media screen and (max-width: 1100px) {
+        width: 92.5%;
+        margin: 2% 0%;
+    }
+`;
+
+export const SubmitButtonStyle = styled.button`
+    flex: 1;
+    display: inline-block;
+    text-align: center;
+    
+    border: 1px solid #282828;
+    background: #fff;
+    color: #282828;
+
+    outline: none;
+
+    font-weight: 400;
+    font-size: 12px;
+
+    @media screen and (max-width: 1100px) {
+        width: 92.5%;
+        margin: 2% 0%;
+    }
+`;
+
+/**
+ * Button Group Styles
+ */
+
+export const ButtonGroupDiv = styled.div`
+
+`;

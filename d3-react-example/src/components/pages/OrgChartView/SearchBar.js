@@ -1,16 +1,43 @@
-import React from "react";
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+
+import FontAwesome from 'react-fontawesome';
 
 import {
-    MDBInputStyled,
-    MDBColStyled,
-} from "./chart-controller-styles";
+    SearchBarDiv,
+    FormStyle,
+    SearchBarStyle,
+    SubmitButtonStyle
+} from "./chart-controller-styles.js";
 
-const SearchPage = () => {
-  return (
-    <MDBColStyled>
-      <MDBInputStyled hint="Search" type="text" />
-    </MDBColStyled>
-  );
+
+class SearchBar extends Component {
+    render() {
+        return (
+          <SearchBarDiv>
+            <FormStyle
+              onSubmit={this.props.onSearchAcronym.bind(this)}
+              autoComplete="off"
+            >
+              <SearchBarStyle
+                type="text"
+                name="acronym"
+                aria-label="search bar"
+                onChange={this.props.onSearchChange}
+                placeholder="Search"
+              />
+              <SubmitButtonStyle
+              type="submit"
+              aria-label="submit search"
+              value=""
+              >
+                <FontAwesome name="fas fa-search"/>
+              </SubmitButtonStyle>
+            </FormStyle>
+          </SearchBarDiv>
+            
+        )
+    }    
 }
 
-export default SearchPage;
+export default SearchBar;

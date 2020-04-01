@@ -79,7 +79,7 @@ class Dropdown extends Component{
               {item.title}
               {item.selected && 
               <DropDownCheck>
-                <FontAwesome className="fas fa-check-square"/>
+                <FontAwesome name="fas fa-check-square"/>
               </DropDownCheck>
               }
             </DropDownListItem>
