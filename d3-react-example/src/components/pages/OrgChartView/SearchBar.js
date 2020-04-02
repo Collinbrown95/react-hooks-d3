@@ -16,7 +16,7 @@ class SearchBar extends Component {
         return (
           <SearchBarDiv>
             <FormStyle
-              onSubmit={this.props.onSearchAcronym.bind(this)}
+              onSubmit={this.props.setExpansionPath.bind(this)}
               autoComplete="off"
             >
               <SearchBarStyle

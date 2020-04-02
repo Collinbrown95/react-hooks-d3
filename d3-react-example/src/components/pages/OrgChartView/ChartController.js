@@ -13,7 +13,7 @@ import { dropDownOptions } from "./dropDownData";
 
 // import SearchPage from "./SearchBar";
 
-function ChartController() {
+function ChartController({setExpansionPath}) {
     // State variable to hold dropdown menu options
     const [dropDownList, setDropDownList] = useState(dropDownOptions);
     // For search results
@@ -33,7 +33,7 @@ function ChartController() {
 
     const onSearchChange = (e) => {
       // TODO: incrementally update the search result state variable as the user types
-      console.log("Search Changed ", e.target.value)
+      // console.log("Search Changed ", e.target.value)
     }
   
     const resetThenSet = (id, key) => {
@@ -60,6 +60,7 @@ function ChartController() {
             <SearchBar
               onSearchAcronym={onSearchAcronym}
               onSearchChange={onSearchChange}
+              setExpansionPath={setExpansionPath}
             />
             <DropDown
               title="Dropdown Menu"

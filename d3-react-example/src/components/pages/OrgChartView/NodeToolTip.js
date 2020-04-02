@@ -12,7 +12,7 @@ function NodeToolTip({hoveredNode, scales}) {
     const styles = {
       display: "none",
       opacity: 0,
-      zIndex: 100,
+      zIndex: 10000000,
       x: xScale ? xScale  - 80 : 0,
       y: yScale ? yScale - 30 : 0,
       width: 50,

@@ -70,5 +70,13 @@ export function dynamicTextSize(d) {
     return fontSize.toString() + "px";
 }
 
+/**
+ * Wraps a string of text to a given width.
+ * @param {*} text 
+ * @param {*} width 
+ */
+export function wrapText(text, width) {
+
+}
 
 export default collapse;

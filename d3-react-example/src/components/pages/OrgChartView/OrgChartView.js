@@ -21,8 +21,22 @@ function OrgChartView() {
     // State variable to hold whether or not a node was hovered over
     const [hoveredNode, setHoveredNode] = useState();
     const [scales, setScales] = useState();
+    // Node expansion path contains the data to expand the d3 tree chart to a specified node.
+    const [nodeExpansionPath, setNodeExpansionPath] = useState();
+    // State to keep track of identity assignment for the data-DOM pairs
+    const [identity, setIdentity] = useState(0);
     // const [data, setData] = useState(initialData);
     // const [data, setData] = useState(treeData);
+
+    /**
+     * For now this just sets the nodeExpansionPath state variable.
+     */
+    const setExpansionPath = (e) => {
+        e.preventDefault();
+        const tempExpansionPath = [10, 1, 0];
+        setNodeExpansionPath(tempExpansionPath);
+    }
+
     return (
         <div style={simpleLayout}>
             <SimpleTreeChart
@@ -32,8 +46,14 @@ function OrgChartView() {
               setHoveredNode={setHoveredNode}
               scales={scales}
               setScales={setScales}
+              nodeExpansionPath={nodeExpansionPath}
+              setNodeExpansionPath={setNodeExpansionPath}
+              identity={identity}
+              setIdentity={setIdentity}
             />
-            <ChartController />
+            <ChartController
+              setExpansionPath={setExpansionPath}
+            />
         </div>  
     )
 }

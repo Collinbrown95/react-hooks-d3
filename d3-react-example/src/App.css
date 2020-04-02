@@ -15,16 +15,16 @@ svg {
 }
 
 circle {
-  fill: #fff;
-  stroke: steelblue;
-  stroke-width: 2px;
-  opacity: 0.5;
+  fill:#eee;
+  stroke: #282828;
+  stroke-width: 0.5px;
+  opacity: 1;
 }
 
 .link {
   fill: none;
-  stroke: #ccc;
-  stroke-width: 1px;
+  stroke: #282828;
+  stroke-width: 1.5px;
 }
 
 #root {

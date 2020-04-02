@@ -34,3 +34,7 @@ export function hideToolTipInstant() {
     .style("opacity", 0)
     .style("display", "hidden")
 }
+
+/**
+ * Simple animation for the target node
+ */
