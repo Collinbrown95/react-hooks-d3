@@ -16,6 +16,7 @@ export function presentToolTip(d, i, nodes) {
     .style("opacity", 1)
     .style("display", "flex")
 }
+
 // TODO: tooltip needs to stay open when the tooltip itself is moused over
 export function hideToolTip() {
   d3.select("#TooltipID")
@@ -31,8 +32,22 @@ export function hideToolTipInstant() {
     .transition()
     .delay(0)
     .duration(0)
-    .style("opacity", 0)
     .style("display", "hidden")
+    .style("opacity", 0)
+}
+
+/**
+ * Applies pre-processing (if any) to the raw label before it is
+ * assigned to the text svg for a node.
+ * @param {*} label 
+ */
+export function preProcessNodeLabel(label) {
+  // case: label is an array of names
+  if (typeof(label) === "object") {
+    return label.join(" ");
+  } else {
+    return label;
+  }
 }
 
 /**

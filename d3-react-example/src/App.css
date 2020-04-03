@@ -10,15 +10,17 @@ svg {
   height: 100%;
 }
 
-.node {
+/* .node {
   cursor: pointer;
-}
+} */
 
 circle {
   fill:#eee;
   stroke: #282828;
   stroke-width: 0.5px;
   opacity: 1;
+
+  cursor: pointer;
 }
 
 .link {

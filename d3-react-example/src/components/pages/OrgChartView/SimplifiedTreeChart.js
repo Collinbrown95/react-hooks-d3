@@ -8,12 +8,14 @@ import {
   nodeSeparation,
   staggerText,
   dynamicTextSize,
+  wrap,
 } from "../../utilities/d3-utilities";
 
 import {
   presentToolTip,
   hideToolTip,
   hideToolTipInstant,
+  preProcessNodeLabel,
 } from "../../utilities/org-chart-utilities";
 
 import NodeToolTip from "./NodeToolTip";
@@ -101,12 +103,10 @@ function SimpleTreeChart({
    * @param {int} i A global variable keeping track of the number of nodes. Used to assign ID to nodes.
    */
   function update(source, root, treeLayout, width, height, i) {
-    console.log("\n i is ", i, "\n")
       // The treeLayout enriches the root with x and y coordinates
       treeLayout(root)
       // Get the nodes and links (edges) of the subtree rooted at root.
       const nodes = root.descendants(), links = root.links();
-      console.log("data are ", nodes)
       // Translate each x coordinate so that it is centered with respect to the svg
       nodes.forEach(function(d) {
         // When using nodeSize, the root is anchored at (0,0), so we need to shift all x coords by width/2
@@ -117,26 +117,19 @@ function SimpleTreeChart({
       // Update the nodes; start by storing a selector for all elements bound to the nodes array.
       const node = svg.select("#parentContainer").selectAll("g.node")
         .data(nodes, function(d) {
-          // var j = i
-          // var a = d.id
           if (d.id) {
             return d.id;
           } else {
             setIdentity(identity+1)
             return (d.id = ++identity)
           }
-          // console.log("d.id is ", a)
-          // console.log("d id evaluates to ", a || (a = ++j))
-          // console.log("d.id is now ", a)
-          // return d.id || (d.id = ++i);
         })
-      console.log("svg selection is ", svg.select("#parentContainer").selectAll("g.node"))
       // Enter new nodes at the parent's previous position
       const nodeEnter = node.enter().append("g")
       .attr("class", "node")
       // Add an "entering" class so we can prevent these nodes from having the mouseover callback applied while they are animating in.
       .classed("entering", true)
-      .attr("transform", function(d) {console.log("source is ", source.x0, " : ", source.y0); return "translate(" + source.x0 + "," + source.y0 + ")"; })
+      .attr("transform", function(d) { return "translate(" + source.x0 + "," + source.y0 + ")"; })
       // Append a circle SVG to the set of entering elements. Node that each element of nodeEnter is its own group
       // container that will hold a circle and a text element.
       nodeEnter.append("circle")
@@ -149,10 +142,11 @@ function SimpleTreeChart({
       .attr("dy", ".20em")
       .attr("text-anchor", function(d) {
         // Stagger labels based on odd/even
-        return d.id % 2 == 0 ? "middle" : "middle"; 
+        return d.depth === 0 ? "middle" : "start"; 
       })
       .text(function(d) {
-          return d.data.name; 
+          // The function that returns the text for the labels of each node goes here
+          return preProcessNodeLabel(d.data.name); 
       })
       .style("fill-opacity", 1e-6);
       
@@ -166,11 +160,13 @@ function SimpleTreeChart({
             (!d3.select(this).classed("exiting")) &&
             (!d3.select(this).classed("expanding"))
             ) {
-            setScales({xScale: d.x, yScale: d.y});
+            // Set the position of the tooltip to be next to the hovered node on the d3 visualization
+            setScales({xScale: d.x-25, yScale: d.y+25});
             setHoveredNode(d);
             presentToolTip(d, i, nodes);
           }
         })
+        // On mouseout, we want to check if the tooltip is hovered over before making it disappear.
         .on("mouseout", hideToolTip);
       
       nodeUpdate
@@ -194,24 +190,40 @@ function SimpleTreeChart({
         .attr("r", 15)
         .style("fill", function(d) {
           if (d.terminalNode) {
-            return "#ffadd5";
+            return "rgba(219, 0, 106, 0.75)";
           } else {
             return d._children ? "#eee" : "#fff";
           }
           })
         .style("stroke", function(d) {
           if (d.terminalNode) {
-            return "rgba(219, 0, 106, 0.7)";
+            return "#dc006c";
           } else {
             return "#282828";
           }
           })
+      
+      // Check if text elements have the "text-wrapped" class applied already; if not, apply the transformation
+      // and then class those elements as "text-wrapped"
+      nodeUpdate.select("text")
+        // We only want to apply wrapping to elements that have not already been wrapped.
+        .filter(function() {
+          // console.log(this.classList)
+          if (!this.classList.contains("text-wrapped")) {
+            return this;
+          }
+        })
+        .call(wrap, generateNodeSize(width, height)[0]*0.9)
+        .classed("text-wrapped", true)
       // Once the transition is complete, the set of text elements in the updating group should arrive at the below final state.
       nodeUpdate.select("text")
         .style("font-size", dynamicTextSize)
-        .style("fill-opacity", 1);
+        .style("fill-opacity", function(d, i, nodes) {
+          // console.log(d)
+          // console.log(nodes[i].children)
+          return 1;
+        });
       
-      console.log("The exit selection is ", node.exit())
       // Apply transition to the exiting nodes.
       const nodeExit = node.exit()
         // Apply an exiting class so that mouseover events cannot fire while the node is exiting. These nodes are all removed from

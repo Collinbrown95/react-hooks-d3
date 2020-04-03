@@ -1,3 +1,4 @@
+import * as d3 from "d3";
 /**
  * Collapses child nodes of a tree
  */
@@ -23,24 +24,46 @@ export function generateNodeSize(width, height) {
         case (width > 400 && width <= 600):
             return [width/7, height/7];
         case (width > 600 && width <= 800):
-            return [width/9, height/9];
+            return [width/8, height/8];
         case (width > 800 && width <= 1000):
-            return [width/11, height/11];
+            return [width/9, height/9];
         case (width > 1000 && width <= 1200):
-            return [width/13, height/13];
+            return [width/11, height/11];
         case (width > 1200):
-            return [width/15, height/15];
+            return [width/13, height/13];
         default:
-            return [width/15, height/15];
+            return [width/13, height/13];
     }
 }
 
 /**
- * Generates a font based on the window dimensions given by resizeObserver
- * @param {number} width 
+ * Wraps a string of text to a given width.
+ * @param {*} text 
+ * @param {*} width 
  */
-export function generateTextSize(width) {
-
+export function wrap(text, width) {
+    /** Wraps text of the nodes so that they don't clutter the screen. */
+    text.each(function() {
+      var text = d3.select(this),
+          words = text.text().split(/[\s,-]+/).reverse(),
+          word,
+          line = [],
+          lineNumber = 0,
+          lineHeight = 1.2, // ems
+          y = text.attr("y"),
+          dy = parseFloat(text.attr("dy")),
+          tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+      while (word = words.pop()) {
+        line.push(word);
+        tspan.text(line.join(" "));
+        if (tspan.node().getComputedTextLength() > width) {
+          line.pop();
+          tspan.text(line.join(" "));
+          line = [word];
+          tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+        }
+      }
+  });
 }
 
 export function nodeSeparation(a, b) {
@@ -52,11 +75,11 @@ export function nodeSeparation(a, b) {
  * @param {*} d 
  */
 export function staggerText(d) {
-    switch (d.id % 2) {
-        case 0:
-            return 25;
-        case 1:
-            return -25;
+    switch (d.depth === 0) {
+        case true:
+            return -50;
+        case false:
+            return 35;
     }
 }
 
@@ -68,15 +91,6 @@ export function staggerText(d) {
 export function dynamicTextSize(d) {
     const fontSize = 18 - d.depth;
     return fontSize.toString() + "px";
-}
-
-/**
- * Wraps a string of text to a given width.
- * @param {*} text 
- * @param {*} width 
- */
-export function wrapText(text, width) {
-
 }
 
 export default collapse;
