@@ -1,23 +1,27 @@
-const initialData = {
-    name: "😐",
-    children: [
+import { hierarchy } from "d3";
+
+import collapse from "../../utilities/d3-utilities.js";
+
+var initialData = {
+    "name": "😐",
+    "children": [
       {
-        name: "🙂",
-        _children: [
+        "name": "🙂",
+        "children": [
           {
-            name: "😀",
-            _children: [
+            "name": "😀",
+            "children": [
                 {
-                    name: "level 3",
-                    _children: [
+                    "name": "level 3",
+                    "children": [
                         {
-                            name: "level 4",
-                            _children: [
+                            "name": "level 4",
+                            "children": [
                                 {
-                                    name: "level 5",
-                                    _children: [
+                                    "name": "level 5",
+                                    "children": [
                                         {
-                                            name: "level 6"
+                                            "name": "level 6"
                                         }
                                     ]
                                 }
@@ -28,16 +32,16 @@ const initialData = {
             ]
           },
           {
-            name: "😁"
+            "name": "😁"
           },
           {
-            name: "🤣",
-            _children: [
+            "name": "🤣",
+            "children": [
                 {
-                    name: "level 3",
-                    _children: [
+                    "name": "level 3",
+                    "children": [
                         {
-                            name: "level 4"
+                            "name": "level 4"
                         }
                     ]
                 }
@@ -46,13 +50,13 @@ const initialData = {
         ]
       },
       {
-        name: "😔",
-        _children: [
+        "name": "😔",
+        "children": [
             {
-                name: "level 3",
-                _children: [
+                "name": "level 3",
+                "children": [
                     {
-                        name: "level 4"
+                        "name": "level 4"
                     }
                 ]
             }
@@ -60,5 +64,9 @@ const initialData = {
       }
     ]
   };
+
+initialData = hierarchy(initialData)
+
+initialData.children.forEach(collapse)
 
 export default initialData;

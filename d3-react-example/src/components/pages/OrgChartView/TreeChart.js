@@ -16,9 +16,6 @@ function TreeChart({ data }) {
   const dimensions = useResizeObserver(wrapperRef);
   const [currentZoomState, setCurrentZoomSate] = useState("translate(-1,0) scale(1)");
   const [nestedStateChange, setNestedStateChange] = useState(false);
-  // const [nodesAdded, setNodesAdded] = useState()
-  // const [nodesRemoved, setNodesRemoved] = useState()
-  // const [previousNodes, setPreviousNodes] = useState()
   // we save data to see if it changed
   const previouslyRenderedData = usePrevious(data);
 
@@ -47,6 +44,8 @@ function TreeChart({ data }) {
 
     // enrich hierarchical data with coordinates
     treeLayout(root);
+    console.log("Apply tree layout to root. The selection of entering nodes is: ")
+    console.log(svg.selectAll(".node").data(root.descendants()).enter())
 
     // console.warn("descendants", root.descendants());
     // console.warn("links", root.links());

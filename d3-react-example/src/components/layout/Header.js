@@ -24,9 +24,8 @@ class Header extends Component {
             <React.Fragment>
                 <HeaderContainer>
                     <AcronymLogo>
-                        {/* <Logo/> */}
-                        <img alt="Acronym Wiki" src={orgChartLogo} width="50" height="50" />
-                        <Title>Org Chart</Title>
+                        <img alt="Acronym Wiki" src={orgChartLogo} width="30" height="30" />
+                        <Title>Dynamic Org Chart</Title>
                     </AcronymLogo>
                     <OptionsContainer>
                         <OptionsLink to="/" onClick={this.props.goBack}>

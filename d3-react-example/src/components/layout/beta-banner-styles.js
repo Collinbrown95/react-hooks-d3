@@ -8,7 +8,7 @@ export const BetaBannerDiv = styled.div`
     width: 100%;
     height: 2.5%;
     background: #282828;
-    border: 0.5px solid #cfd8dc;
+    border-bottom: 0.25px solid #cfd8dc;
     box-shadow: 0 2.5px 5px rgba(0,0,0,0.2);
     @media screen and (max-width: 1050px) {
         
