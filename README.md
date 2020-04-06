@@ -1,5 +1,18 @@
-# react-hooks-d3
-> Simple examples that illustrate the integration of d3.js into React with React hooks
+# d3 react integration
+> This repository illustrates one way to integrate D3.js with React. The use case for this integration is an interative searchable tree chart.
+
+## Overview and Features
+D3.js is one of the most commonly used javascript libraries for building interactive data visualizations on the web. Similarly, React and the ecosystem of libraries built around React have become one of the most popular choices for building component based user interfaces.
+
+The use case of an interactive tree chart was chosen because it includes features that require interactions with React components to cause updates to the D3 visualization, and similarly, it requires that interactions with DOM elements controlled by D3 pass data to React so it can update the application state/render new React components in response to the D3 interaction.
+
+The approach used in this project is to allocate a react component that renders an empty SVG that D3 will treat as the root element. Inside this SVG, D3 has full DOM control, and application-level data are passed from React to D3 through props to the component that renders the SVG.
+
+The features are listed below.
+1. When a user clicks a node in the tree chart, D3 should handle how DOM elements are transitioned/animated, and then allow React to update this data in its state.
+2. When a user selects a dataset from the dropdown menu, React should fetch the data for this tree, and pass it to d3 to render on the DOM.
+3. When a user clicks on a search result, the tree chart should open to the node that contains what the user searched for (e.g. a business unit or person).
+4. When a user interacts with controls on React DOM elements, the chart should update/respond to what the user selected (e.g. expand all, collapse all, etc).
 
 ## TODO:
 1. The ```hierarchy(data)``` method does not recognize the ```_children``` (i.e. hidden children) property by default. Need to find a way to parse the entire hierarchical data structure, and then apply the hidden label to those below the first level.
