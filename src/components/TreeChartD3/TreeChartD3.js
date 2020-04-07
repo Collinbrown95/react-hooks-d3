@@ -10,7 +10,10 @@ import { select,
 // TODO: either explicitly specify imports or import entire module, not both.
 import * as d3 from "d3";
 
-import useResizeObserver from "./useResizeObserver";
+// useDidMountEffect lets you specify a useEffect hook that fires if anything in the dependency
+// array changes but NOT on initial render.
+import useDidMountEffect from "../../utils/useDidMountEffect";
+import useResizeObserver from "../../utils/useResizeObserver";
 
 import {
   generateNodeSize,
@@ -24,10 +27,8 @@ import {
   preProcessNodeLabel,
 } from "../../utils/treeChartD3Utilities";
 
-import NodeToolTip from "./NodeToolTip";
-// useDidMountEffect lets you specify a useEffect hook that fires if anything in the dependency
-// array changes but NOT on initial render.
-import useDidMountEffect from "./useDidMountEffect";
+import Tooltip from "../Tooltip/Tooltip";
+
 
 import { TreeChartWrapperDiv } from "./tree-chart-d3-styles";
 
@@ -366,7 +367,7 @@ function TreeChartD3({
       <svg ref={svgRef}>
         <g id="zoomContainer">
           <g id="parentContainer"></g>
-          <NodeToolTip
+          <Tooltip
             hoveredNode={hoveredNode}
             scales={scales}
           />

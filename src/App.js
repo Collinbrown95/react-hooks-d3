@@ -6,11 +6,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 
-import OrgChartView from './components/pages/OrgChartView/OrgChartView.js';
-import AboutView from './components/pages/AboutView/AboutView.js';
+import OrgChartPage from "./pages/OrgChartPage/OrgChartPage";
+import AboutPage from "./pages/AboutPage/AboutPage"
 
-import Header from './components/layout/Header';
-import Footer from './components/layout/Footer';
+import Header from "./layout/Header/Header";
+import Footer from "./layout/Footer/Footer";
 
 function App() {
 
@@ -22,7 +22,7 @@ function App() {
         path="/"
         render={
           (props) => (
-            <OrgChartView/>
+            <OrgChartPage/>
           )
         }
       />
@@ -31,7 +31,7 @@ function App() {
         path="/about"
         render={
           (props) => (
-            <AboutView/>
+            <AboutPage/>
           )
         }
       />

@@ -2,18 +2,18 @@ import React, { useState, useEffect } from "react";
 import {
     ControlsDiv,
     ControllerTitle,
-} from "./org-chart-view-styles";
+} from "./chart-controls-styles";
 
-import DropDown from "./DropDown";
-import SearchBar from "./SearchBar";
-import ButtonGroup from "./ButtonGroup";
+import DropDown from "../DropDown/DropDown";
+import SearchBar from "../SearchBar/SearchBar";
+import ButtonGroup from "../ButtonGroup/ButtonGroup";
 
 import { dropDownOptions } from "./dropDownData";
 
 
 // import SearchPage from "./SearchBar";
 
-function ChartController({setExpansionPath}) {
+function ChartControls({setExpansionPath}) {
     // State variable to hold dropdown menu options
     const [dropDownList, setDropDownList] = useState(dropDownOptions);
     // For search results
@@ -75,4 +75,4 @@ function ChartController({setExpansionPath}) {
     )
 }
 
-export default ChartController;
+export default ChartControls;

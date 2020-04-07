@@ -8,7 +8,7 @@ import {
     ViewContainer
 } from './org-chart-page-styles';
 
-import largeTreeDiagram from "./treeWithSize";
+import largeTreeDiagram from "../../data/TreeChartData/treeWithSize";
 
 function OrgChartPage() {
     // State variable for the tree data

@@ -7,10 +7,6 @@ import {
     BetaTextStyle,
 } from "./beta-banner-styles.js";
 
-import emailIcon from '../images/send-email.png';
-
-import ReactTooltip from 'react-tooltip'
-
 // TODO: change href to href='mailto:"
 
 class BetaBanner extends Component {

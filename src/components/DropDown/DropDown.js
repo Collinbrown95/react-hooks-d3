@@ -9,7 +9,7 @@ import {
   DropDownUnorderedList,
   DropDownListItem,
   DropDownCheck,
-} from "./chart-controller-styles";
+} from "./dropdown-styles";
 
 class Dropdown extends Component{
   constructor(props){

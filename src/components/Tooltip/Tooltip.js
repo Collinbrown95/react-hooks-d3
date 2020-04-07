@@ -12,7 +12,7 @@ import {
 /**
  * A functional component that renders a tooltip at a given x,y position
  */
-function NodeToolTip({hoveredNode, scales}) {
+function Tooltip({hoveredNode, scales}) {
   if (scales) {
     var xScale;
     var yScale;
@@ -39,4 +39,4 @@ function NodeToolTip({hoveredNode, scales}) {
   )
 }
 
-export default NodeToolTip
+export default Tooltip

@@ -8,7 +8,7 @@ import {
     FormStyle,
     SearchBarStyle,
     SubmitButtonStyle
-} from "./chart-controller-styles.js";
+} from "./search-bar-styles";
 
 
 class SearchBar extends Component {

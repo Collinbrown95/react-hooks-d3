@@ -3,7 +3,7 @@
  */
 import { hierarchy } from "d3";
 
-import collapse from "../../utilities/d3-utilities.js";
+import { collapse } from "../../utils/treeChartD3Utilities";
 
 var largeTreeDiagram = {
 	"children" : [

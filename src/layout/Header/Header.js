@@ -11,11 +11,9 @@ import {
 
 import BetaBanner from "./BetaBanner.js";
 
-import orgChartLogo from '../images/org-chart-logo.png';
-import searchIcon from '../images/search.png';
-import aboutIcon from '../images/about.png';
-import Logo from './Logo.js';
-
+import orgChartLogo from '../../assets/images/org-chart-logo.png';
+import searchIcon from '../../assets/images/search.png';
+import aboutIcon from '../../assets/images/about.png';
 
 class Header extends Component {
 

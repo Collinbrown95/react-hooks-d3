@@ -14,9 +14,9 @@ import {
 
 import ReactTooltip from 'react-tooltip'
 
-import githubIcon from '../images/github-icon.png';
-import gitlabIcon from '../images/gitlab-icon.png';
-import cdoIcon from '../images/cdo-icon.png';
+import githubIcon from '../../assets/images/github-icon.png';
+import gitlabIcon from '../../assets/images/gitlab-icon.png';
+import cdoIcon from '../../assets/images/cdo-icon.png';
 
 
 

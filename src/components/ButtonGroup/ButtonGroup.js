@@ -6,10 +6,10 @@ import FontAwesome from 'react-fontawesome';
 import {
     ButtonGroupDiv,
     InnerButton,
-} from "./chart-controller-styles.js";
+} from "./button-group-styles";
 
 
-class SearchBar extends Component {
+class ButtonGroup extends Component {
     onClick() {
 
     }
@@ -43,4 +43,4 @@ class SearchBar extends Component {
     }    
 }
 
-export default SearchBar;
+export default ButtonGroup;
