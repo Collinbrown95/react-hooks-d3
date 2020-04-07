@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, useContext } from 'react'
 import FontAwesome from 'react-fontawesome';
 
 import {
@@ -11,7 +11,26 @@ import {
   DropDownCheck,
 } from "./dropdown-styles";
 
-class Dropdown extends Component{
+import { D3Context } from "../../contexts/D3Context";
+
+// Temporary imports for illustration purposes
+import initialData from "../../data/TreeChartData/SampleData";
+import largeTreeDiagram from "../../data/TreeChartData/treeWithSize";
+import treeData from "../../data/TreeChartData/SimpleSampleData";
+import {
+  ESDC,
+  FinanceCanada,
+  StatisticsCanada,
+  ECCC,
+  FederalCourt,
+  HealthCanada,
+  Agriculture,
+  CRA,
+} from "../../data/TreeChartData/d3CanadaOrgCharts";
+
+class Dropdown extends Component {
+  // TODO: change this when switching to a functional component
+  static contextType = D3Context;
   constructor(props){
     super(props)
     this.state = {
@@ -44,6 +63,24 @@ class Dropdown extends Component{
   }
 
   selectItem(title, id, stateKey){
+    console.log("Some GOC org charts")
+    console.log(ESDC)
+    // Get the d3 state and action dispatcher (TODO: change this when dropdown becomes a functional component)
+    const { dispatch } = this.context;
+    // API call would go here and fetch the required tree chart root. For illustration
+    // just use the imported datasets
+    if (id % 3 === 0) {
+      console.log("dispatching ", title, " with ID ", id)
+      dispatch({type: "SET_TREECHART_ROOT", dataRoot: ESDC});
+    } else if (id % 3 === 1) {
+      console.log("dispatching ", title, " with ID ", id)
+      dispatch({type: "SET_TREECHART_ROOT", dataRoot: StatisticsCanada});
+    } else if (id % 3 === 2) {
+      console.log("dispatching ", title, " with ID ", id)
+      dispatch({type: "SET_TREECHART_ROOT", dataRoot: Agriculture});
+    } else {
+      console.log("Doing the default")
+    }
     this.setState({
       headerTitle: title,
       listOpen: false

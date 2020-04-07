@@ -4,9 +4,13 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 
+import D3ContextProvider from "./contexts/D3Context";
+
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <D3ContextProvider>
+      <App />
+    </D3ContextProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );

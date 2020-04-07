@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useContext } from "react";
 
 import { select,
          hierarchy, 
@@ -29,16 +29,18 @@ import {
 
 import Tooltip from "../Tooltip/Tooltip";
 
-
 import { TreeChartWrapperDiv } from "./tree-chart-d3-styles";
 
+import { D3Context } from "../../contexts/D3Context";
+
 function TreeChartD3({
-  data, setData,
   hoveredNode, setHoveredNode,
-  scales, setScales,
   nodeExpansionPath, setNodeExpansionPath,
-  identity, setIdentity,
 }) {
+  // Get the d3 state and action dispatcher
+  const { d3State, dispatch } = useContext(D3Context);
+  // Define component-level state
+  const [scales, setScales] = useState();
   const svgRef = useRef();  // hold reference to the SVG element that d3 will render its content into
   const wrapperRef = useRef();  // hold reference to the div element that contains the svg (used for resizing)
   const dimensions = useResizeObserver(wrapperRef);  // dimensions will change on window resize
@@ -91,7 +93,7 @@ function TreeChartD3({
     // Note: the data are transformed with d3's hierarchy() function outside of this component and the transformed
     // data are stored in the parent's state. The reason for this is to keep track of the tree chart's state outside
     // of this component.
-    const root = data
+    const root = d3State.dataRoot;
     // Set initial position of the root
     root.x0 = width/2;
     root.y0 = 0;
@@ -103,7 +105,8 @@ function TreeChartD3({
       update(root, root, treeLayout, width, height, i);
     }
   }, [dimensions,
-      nodeExpansionPath,]);
+      nodeExpansionPath,
+      d3State.dataRoot]);
   
   /**
    * 
@@ -129,8 +132,8 @@ function TreeChartD3({
           if (d.id) {
             return d.id;
           } else {
-            setIdentity(identity+1)
-            return (d.id = ++identity)
+            dispatch({type: "SET_DATA_IDENTITY"});
+            return (d.id = ++d3State.dataIdentity);
           }
         })
       // Enter new nodes at the parent's previous position

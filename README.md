@@ -107,3 +107,4 @@ __Sources__
 __React Hooks and Context API__
 1. [this tutorial](https://blog.logrocket.com/use-hooks-and-context-not-react-and-redux/)
 2. [this youtube playlist](https://www.youtube.com/watch?v=6RhOzQciVwI&list=PL4cUxeGkcC9hNokByJilPg5g9m2APUePI&index=1)
+3. [detailed explanation of useEffect and order of updating/rendering](https://overreacted.io/a-complete-guide-to-useeffect/)
