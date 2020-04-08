@@ -2,12 +2,14 @@ import React, { createContext, useReducer } from 'react';
 
 import { d3Reducer } from "../reducers/d3Reducer";
 
-import largeTreeDiagram from "../data/TreeChartData/treeWithSize";
+import CanadaOrgChart from "../data/GovernmentCanadaOrgChart/GovernmentOrgChart";
 
 // TODO: consider initialization function that sets the initial state.
 const initialState = {
     dataIdentity: 0,
-    dataRoot: largeTreeDiagram,
+    // Hard-coding ESDC as the default starting department
+    dataRoot: CanadaOrgChart["Employment and Social Development Canada"][0],
+    // Node expansion path (this will highlight the path to the node that was searched for).
 }
 
 export const D3Context = createContext(initialState);

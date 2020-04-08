@@ -115,6 +115,7 @@ function TreeChartD3({
    * @param {int} i A global variable keeping track of the number of nodes. Used to assign ID to nodes.
    */
   function update(source, root, treeLayout, width, height, i) {
+      console.log("root is ", root)
       // The treeLayout enriches the root with x and y coordinates
       treeLayout(root)
       // Get the nodes and links (edges) of the subtree rooted at root.
@@ -124,7 +125,7 @@ function TreeChartD3({
         // When using nodeSize, the root is anchored at (0,0), so we need to shift all x coords by width/2
         d.x = d.x + (width + margin.left + margin.right)/2;
         // Normalize for fixed-depth; also need to shift the nodes down
-        d.y = d.depth * 180 + height*0.10;
+        d.y = d.depth * 220 + height*0.20;
       });
       // Update the nodes; start by storing a selector for all elements bound to the nodes array.
       const node = svg.select("#parentContainer").selectAll("g.node")
@@ -225,7 +226,7 @@ function TreeChartD3({
             return this;
           }
         })
-        .call(wrap, generateNodeSize(width, height)[0]*0.9)
+        .call(wrap, generateNodeSize(width, height)[0]*0.95)
         .classed("text-wrapped", true)
       // Once the transition is complete, the set of text elements in the updating group should arrive at the below final state.
       nodeUpdate.select("text")

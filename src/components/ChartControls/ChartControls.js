@@ -7,6 +7,7 @@ import {
 import DropDown from "../DropDown/DropDown";
 import SearchBar from "../SearchBar/SearchBar";
 import ButtonGroup from "../ButtonGroup/ButtonGroup";
+import SearchResults from "../SearchResults/SearchResults";
 
 import { dropDownOptions } from "./dropDownData";
 
@@ -63,7 +64,7 @@ function ChartControls({setExpansionPath}) {
               setExpansionPath={setExpansionPath}
             />
             <DropDown
-              title="Dropdown Menu"
+              title="Select Department"
               list={dropDownList}
               resetThenSet={resetThenSet}
             />
@@ -71,6 +72,7 @@ function ChartControls({setExpansionPath}) {
               activeButton={activeButton}
               setActiveButtonClick={setActiveButtonClick}
             />
+            <SearchResults />
         </ControlsDiv>
     )
 }

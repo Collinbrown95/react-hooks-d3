@@ -13,6 +13,18 @@ export const collapse = (d) => {
 }
 
 /**
+ * Expands child nodes of a given node of a tree
+ * @param {object} d
+ */
+export const expand = (d) => {
+    if (d._children) {
+        d.children = d._children;
+        d.children.forEach(expand);
+        d._children = null;
+    }
+}
+
+/**
  * Generates an array specifying node size using the screen width and height
  * @param {number} width
  * @param {number} height
@@ -24,17 +36,17 @@ export const generateNodeSize = (width, height) => {
         case (width <= 400):
             return [width/5, height/5];
         case (width > 400 && width <= 600):
-            return [width/7, height/7];
+            return [width/6, height/6];
         case (width > 600 && width <= 800):
-            return [width/8, height/8];
+            return [width/7, height/7];
         case (width > 800 && width <= 1000):
-            return [width/9, height/9];
+            return [width/8, height/8];
         case (width > 1000 && width <= 1200):
-            return [width/11, height/11];
+            return [width/10, height/10];
         case (width > 1200):
-            return [width/13, height/13];
+            return [width/12, height/12];
         default:
-            return [width/13, height/13];
+            return [width/12, height/12];
     }
 }
 
@@ -85,7 +97,7 @@ export const nodeSeparation = (a, b) => {
 export const staggerText = (d) => {
     switch (d.depth === 0) {
         case true:
-            return -50;
+            return -100;
         case false:
             return 35;
     }
@@ -97,7 +109,7 @@ export const staggerText = (d) => {
  * @param {object} d 
  */
 export const dynamicTextSize = (d) => {
-    const fontSize = 18 - d.depth;
+    const fontSize = 16 - d.depth;
     return fontSize.toString() + "px";
 }
 

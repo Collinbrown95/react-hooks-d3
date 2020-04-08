@@ -11,7 +11,7 @@ import {
 
 import BetaBanner from "./BetaBanner.js";
 
-import orgChartLogo from '../../assets/images/org-chart-logo.png';
+import orgChartLogo from '../../assets/images/logo.svg';
 import searchIcon from '../../assets/images/search.png';
 import aboutIcon from '../../assets/images/about.png';
 
@@ -22,7 +22,7 @@ class Header extends Component {
             <React.Fragment>
                 <HeaderContainer>
                     <AcronymLogo>
-                        <img alt="Acronym Wiki" src={orgChartLogo} width="30" height="30" />
+                        <img alt="Acronym Wiki" src={orgChartLogo} width="50" height="50" />
                         <Title>Dynamic Org Chart</Title>
                     </AcronymLogo>
                     <OptionsContainer>

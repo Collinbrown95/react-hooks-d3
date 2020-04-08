@@ -21,7 +21,7 @@ function OrgChartPage() {
      */
     const setExpansionPath = (e) => {
         e.preventDefault();
-        const tempExpansionPath = [10, 1, 0];
+        const tempExpansionPath = [0, 0, 0];
         setNodeExpansionPath(tempExpansionPath);
     }
 
