@@ -14,7 +14,7 @@ import { dropDownOptions } from "./dropDownData";
 
 // import SearchPage from "./SearchBar";
 
-function ChartControls({setExpansionPath}) {
+function ChartControls() {
     // State variable to hold dropdown menu options
     const [dropDownList, setDropDownList] = useState(dropDownOptions);
     // For search results

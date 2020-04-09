@@ -7,13 +7,20 @@ import CanadaOrgChart from "../data/GovernmentCanadaOrgChart/GovernmentOrgChart"
 // TODO: break this into multiple contexts/reducers if required
 // TODO: consider initialization function that sets the initial state.
 const initialState = {
+    // Identity to keep track of data elements in the d3 visualization
     dataIdentity: 0,
     // Hard-coding ESDC as the default starting department
     dataRoot: CanadaOrgChart["Employment and Social Development Canada"][0],
+    // TODO: could replace employeeSearchResults with more generic results (e.g. people in business unit)
+    searchResultsTitle: "",
     // Employee search results
     employeeSearchResults: [],
     // Node expansion path (this will highlight the path to the node that was searched for).
     nodeExpansionPath: null,
+    // Tooltip coordinates
+    tooltipCoordinates: null,
+    // Tooltip node
+    tooltipHoveredNode: null,
 }
 
 export const D3Context = createContext(initialState);

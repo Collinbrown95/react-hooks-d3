@@ -32,6 +32,12 @@ export const d3Reducer = (state, action) => {
                 ...state,
                 employeeSearchResults: action.employeeSearchResults
             };
+        case "SET_TOOLTIP_COORDINATES":
+            return {
+                ...state,
+                tooltipCoordinates: action.tooltipCoordinates,
+            }
+
         default:
             return state;
     }

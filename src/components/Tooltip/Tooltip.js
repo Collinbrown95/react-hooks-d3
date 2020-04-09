@@ -12,11 +12,11 @@ import {
 /**
  * A functional component that renders a tooltip at a given x,y position
  */
-function Tooltip({hoveredNode, scales}) {
-  if (scales) {
-    var xScale;
-    var yScale;
-    var { xScale, yScale } = scales
+function Tooltip({hoveredNode, tooltipCoordinates}) {
+  if (tooltipCoordinates) {
+    // TODO: could display metadata from the hoveredNode
+    // console.log("hovered node is ", hoveredNode);
+    var { xScale, yScale } = tooltipCoordinates;
   }
 
   // The <foreignObject> SVG element includes elements from a different XML namespace. In the context of a browser, it is most likely (X)HTML.

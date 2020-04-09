@@ -41,13 +41,13 @@ export const employeeSearchResults = [
      },
      {
         "name": "John Doe",
-        "title": "Policy Analyst",
-        "department": "Canada Transportation Agency",
-        "businessUnit": "Pleadings and Hearings",
+        "title": "Astronaut Intern",
+        "department": "Canadian Space Agency",
+        "businessUnit": "Astronauts Life Science and Space Medicine",
         "email": "john.doe@hrsdc-rhdcc.gc.ca",
         "phone": "(999) 999 9999",
         "address": "123 Fake Ave. Ottawa, Ontario (A1B 2C3)",
-        "expansionPath": [2, 1, 1],
+        "expansionPath": [0, 2, 2],
      },
      {
         "name": "John Doe",

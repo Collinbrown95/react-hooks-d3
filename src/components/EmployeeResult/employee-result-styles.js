@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export const EmployeeResultOuterDiv = styled.div`
-    border-bottom: 0.5px solid #fff;
+    border-bottom: 0.25px solid #fff !important;
 
     padding-top: 2%;
 `;

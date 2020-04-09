@@ -35,12 +35,10 @@ import { D3Context } from "../../contexts/D3Context";
 
 function TreeChartD3({
   hoveredNode, setHoveredNode,
-  nodeExpansionPath, setNodeExpansionPath,
 }) {
   // Get the d3 state and action dispatcher
   const { d3State, dispatch } = useContext(D3Context);
-  // Define component-level state
-  const [scales, setScales] = useState();
+
   const svgRef = useRef();  // hold reference to the SVG element that d3 will render its content into
   const wrapperRef = useRef();  // hold reference to the div element that contains the svg (used for resizing)
   const dimensions = useResizeObserver(wrapperRef);  // dimensions will change on window resize
@@ -105,7 +103,6 @@ function TreeChartD3({
       update(root, root, treeLayout, width, height, i);
     }
   }, [dimensions,
-      nodeExpansionPath,
       d3State.nodeExpansionPath,
       d3State.dataRoot]);
   
@@ -175,7 +172,13 @@ function TreeChartD3({
             (!d3.select(this).classed("expanding"))
             ) {
             // Set the position of the tooltip to be next to the hovered node on the d3 visualization
-            setScales({xScale: d.x-25, yScale: d.y+25});
+            dispatch({
+              type: "SET_TOOLTIP_COORDINATES",
+              tooltipCoordinates: {
+                xScale: d.x-25,
+                yScale: d.y+25,
+              }
+            });
             setHoveredNode(d);
             presentToolTip(d, i, nodes);
           }
@@ -374,7 +377,7 @@ function TreeChartD3({
           <g id="parentContainer"></g>
           <Tooltip
             hoveredNode={hoveredNode}
-            scales={scales}
+            tooltipCoordinates={d3State.tooltipCoordinates}
           />
         </g>
       </svg>
