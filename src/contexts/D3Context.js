@@ -4,12 +4,16 @@ import { d3Reducer } from "../reducers/d3Reducer";
 
 import CanadaOrgChart from "../data/GovernmentCanadaOrgChart/GovernmentOrgChart";
 
+// TODO: break this into multiple contexts/reducers if required
 // TODO: consider initialization function that sets the initial state.
 const initialState = {
     dataIdentity: 0,
     // Hard-coding ESDC as the default starting department
     dataRoot: CanadaOrgChart["Employment and Social Development Canada"][0],
+    // Employee search results
+    employeeSearchResults: [],
     // Node expansion path (this will highlight the path to the node that was searched for).
+    nodeExpansionPath: null,
 }
 
 export const D3Context = createContext(initialState);

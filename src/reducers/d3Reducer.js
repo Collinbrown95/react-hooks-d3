@@ -16,11 +16,22 @@ export const d3Reducer = (state, action) => {
     switch(action.type) {
         case "SET_DATA_IDENTITY":
             const dataIdentity = state.dataIdentity + 1;
-            return {...state, dataIdentity};
+            return {
+                ...state,
+                dataIdentity
+            };
         // TODO: resetting the root should also clear the state for things like (1) search path etc.
         case "SET_TREECHART_ROOT":
-            return {...state, dataRoot: action.dataRoot}
-
+            return {
+                ...state,
+                dataRoot: action.dataRoot,
+                nodeExpansionPath: action.nodeExpansionPath ? action.nodeExpansionPath : null,
+            };
+        case "SET_EMPLOYEE_SEARCH_RESULTS":
+            return {
+                ...state,
+                employeeSearchResults: action.employeeSearchResults
+            };
         default:
             return state;
     }

@@ -8,7 +8,6 @@ import {
     ViewContainer
 } from './org-chart-page-styles';
 
-import largeTreeDiagram from "../../data/TreeChartData/treeWithSize";
 
 function OrgChartPage() {
     // State variable to hold whether or not a node was hovered over

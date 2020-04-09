@@ -32,10 +32,7 @@ function ChartControls({setExpansionPath}) {
       console.log("Submitted Search ", e)
     }
 
-    const onSearchChange = (e) => {
-      // TODO: incrementally update the search result state variable as the user types
-      // console.log("Search Changed ", e.target.value)
-    }
+    
   
     const resetThenSet = (id, key) => {
       // Get a deep copy of the dropDownList
@@ -60,8 +57,6 @@ function ChartControls({setExpansionPath}) {
             </ControllerTitle>
             <SearchBar
               onSearchAcronym={onSearchAcronym}
-              onSearchChange={onSearchChange}
-              setExpansionPath={setExpansionPath}
             />
             <DropDown
               title="Select Department"

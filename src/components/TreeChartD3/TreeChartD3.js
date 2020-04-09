@@ -99,13 +99,14 @@ function TreeChartD3({
     root.y0 = 0;
     // If there is no nodeExpansionPath prop, then open to the root by default; otherwise expand to the searched
     // node.
-    if (nodeExpansionPath) {
-      expandToNode(nodeExpansionPath, root, treeLayout, width, height, i);
+    if (d3State.nodeExpansionPath) {
+      expandToNode(d3State.nodeExpansionPath, root, treeLayout, width, height, i);
     } else {
       update(root, root, treeLayout, width, height, i);
     }
   }, [dimensions,
       nodeExpansionPath,
+      d3State.nodeExpansionPath,
       d3State.dataRoot]);
   
   /**
