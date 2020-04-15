@@ -80,7 +80,7 @@ function TreeChartD3() {
     // Variables to hold animation duration and node counter
     var i=0;
     
-    // Create the tree layout; this should resize dynamically
+    // Create the tree layout; set nodeSize so that it is set dynamically based on the width and height of the SVG container.
     // Note: when setting nodeSize instead of size (they are mutually exclusive; one overrides the other),
     // the root node is anchored at coordinate (0,0) by default.
     // console.log("layout is ", generateNodeSize(width, height));

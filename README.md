@@ -1,27 +1,48 @@
-# d3 react integration
-> This repository illustrates one way to integrate D3.js with React. The use case for this integration is an interative searchable organization chart for the Government of Canada. The underlying organization chart data are derived using the [Government of Canada Employee Contact Information](https://open.canada.ca/data/en/dataset/8ec4a9df-b76b-4a67-8f93-cdbc2e040098) dataset that is made available under the [Open Government License - Canada](https://open.canada.ca/en/open-government-licence-canada).
+# React-d3 Integration
+> This repository illustrates one way to integrate D3.js with React. The use case for this integration is an interactive searchable organization chart for the Government of Canada. The underlying organization chart data are derived using the [Government of Canada Employee Contact Information (GEDS)](https://open.canada.ca/data/en/dataset/8ec4a9df-b76b-4a67-8f93-cdbc2e040098) dataset that is made available under the [Open Government License - Canada](https://open.canada.ca/en/open-government-licence-canada). The code that was used to extract the org chart from the GEDS dataset can be found [here](https://github.com/Collinbrown95/goc-org-chart/blob/master/back-end/utils.py).
 
 ## Overview and Features
 D3.js is one of the most commonly used JavaScript libraries for building interactive data visualizations on the web. Similarly, React and the ecosystem of libraries built around React have become one of the most popular choices for building component based user interfaces.
 
-The use case of an interactive organization chart was chosen because it includes features that require interactions with React components to cause updates to the D3 visualization. Similarly, it requires that interactions with DOM elements controlled by D3 can pass data to React so it can update the application state/render new React components in response to the D3 interaction.
-
-The approach used in this project is to allocate a react component that renders an empty SVG that D3 will treat as the root element. Inside this SVG, D3 has full DOM control, and application-level data are passed from React to D3 through props to the component that renders the SVG.
+The use case of an interactive organization chart was chosen because it includes features that require interactions with React components to cause updates to the D3 visualization. Similarly, it requires that DOM elements controlled by D3 pass data to React so that React can update the application state and render/update components in response to the D3 interaction.
 
 The features are listed below.
-1. When a user clicks a node in the tree chart, D3 should handle how DOM elements are transitioned/animated, and then allow React to update this data in its state.
-2. When a user selects a dataset from the dropdown menu, React should fetch the data for this tree, and pass it to d3 to render on the DOM.
-3. When a user clicks on a search result, the tree chart should open to the node that contains what the user searched for (e.g. a business unit or person).
-4. When a user interacts with controls on React DOM elements, the chart should update/respond to what the user selected (e.g. expand all, collapse all, etc).
 
-## TODO:
-1. The ```hierarchy(data)``` method does not recognize the ```_children``` (i.e. hidden children) property by default. Need to find a way to parse the entire hierarchical data structure, and then apply the hidden label to those below the first level.
+__Core features__
+1. When a user clicks a node in the tree chart, D3 should handle how DOM elements are transitioned/animated, and then allow React to update this data in its state.
+
+![Click node animation](images/node-click.gif)
+
+2. When a user selects a dataset from the dropdown menu, React should fetch the data for this tree, and pass it to d3 to render on the DOM.
+
+![Select department animation](images/dropdown-click.gif)
+
+1. When a user clicks on a search result, the tree chart should open to the node that contains what the user searched for (e.g. a business unit or person).
+
+![Click search result animation](images/open-in-org-chart.gif)
+
+4. When a user clicks the "See the team" tooltip, the chart controls component should display the members who are on that team.
+
+![See the team animation](images/see-the-team.gif)
+
+__Nice (but not essential) features__
+1. When a user resizes their browser, the d3 visualization should resize to fit the user's screen.
+
+![Browser resize animation](images/browser-resize.gif)
+
+2. The usual pan-and-zoom functionality that can be implemented with D3 should not be affected by this integration with React.
+
+![Pan and zoom animation](images/pan-and-zoom.gif)
+
+Note that several of these features above use fake data (e.g. fake search results, fake team list, etc). Since the focus of this repo is on integrating react and d3, using placeholder data is sufficient for illustrative purposes.
 
 ## High Level Overview
-Note: this is just one candidate setup to integrate React with d3.
+The approach used in this project is to allocate a react component that renders an empty SVG that D3 will treat as the root element. Inside this SVG, D3 has full DOM control, and application-level data are passed from React to D3 through props to the component that renders the SVG.
 
-- The functional component ```OrgChartView``` holds state hooks for the original hierarchical data and the d3 ```Node``` prototype of the same data that gets copied when calling ```d3.hierarchy(data)```. The reason for this is to preserve the original data, but also keep a copy of the prototype so that the state of the tree chart can be preserved when the visualization re-renders from resizing the screen.
-- 
+### React refs
+The TreeChartD3 component makes use of [React refs](https://reactjs.org/docs/refs-and-the-dom.html) to hold direct references to the empty SVG as well as the div element that contains it. Using these refs, it is possible to execute d3 code imperatively inside of the TreeChartD3 component. This allows the d3 code to directly modify DOM elements inside of the svg ref outside of React's typical data flow.
+
+Intuitively, this means that the svg ref is the "hand-off" point where React lets d3 take control of the DOM. Unlike ordinary React components that are updating the virtual DOM and 
 
 ## D3 and React - general information
 - General update pattern of d3 is to select elements, map and synchronize those elements to data, and define handlers for what should happen to the svgs when data are entered, updated, or exited.
@@ -103,6 +124,7 @@ __Sources__
 17. [add tooltip](https://stackoverflow.com/questions/49611148/how-to-add-tooltip-in-react-d3-v4-bar-chart)
 18. [react-d3 tooltip (TODO: see if there is a straightforward way to get the rendered tooltip by its ID then use d3 to handle transitions, delays, etc.)](https://github.com/react-d3/react-d3-tooltip) (see here also https://www.npmjs.com/package/react-d3-tooltip). Other approach could be to add/remove classes and handle transition animations with css (see [here](https://stackoverflow.com/questions/38116805/react-js-d3-charts-tooltip/56674517#56674517)).
 19. [custom dropdown menu tutorial](https://blog.logrocket.com/building-a-custom-dropdown-menu-component-for-react-e94f02ced4a1/) with [github page](https://github.com/dbilgili/Custom-ReactJS-Dropdown-Components).
+20. [D3-react tutorial](https://medium.com/@Elijah_Meeks/interactive-applications-with-react-d3-f76f7b3ebc71)
 
 __React Hooks and Context API__
 1. [this tutorial](https://blog.logrocket.com/use-hooks-and-context-not-react-and-redux/)
