@@ -25,6 +25,8 @@ import {
   hideToolTip,
   hideToolTipInstant,
   preProcessNodeLabel,
+  colourNode,
+  removeNodeColour,
 } from "../../utils/treeChartD3Utilities";
 
 import Tooltip from "../Tooltip/Tooltip";
@@ -33,9 +35,7 @@ import { TreeChartWrapperDiv } from "./tree-chart-d3-styles";
 
 import { D3Context } from "../../contexts/D3Context";
 
-function TreeChartD3({
-  hoveredNode, setHoveredNode,
-}) {
+function TreeChartD3() {
   // Get the d3 state and action dispatcher
   const { d3State, dispatch } = useContext(D3Context);
 
@@ -123,7 +123,7 @@ function TreeChartD3({
         // When using nodeSize, the root is anchored at (0,0), so we need to shift all x coords by width/2
         d.x = d.x + (width + margin.left + margin.right)/2;
         // Normalize for fixed-depth; also need to shift the nodes down
-        d.y = d.depth * 220 + height*0.20;
+        d.y = d.depth * 250 + height*0.20;
       });
       // Update the nodes; start by storing a selector for all elements bound to the nodes array.
       const node = svg.select("#parentContainer").selectAll("g.node")
@@ -177,14 +177,69 @@ function TreeChartD3({
               tooltipCoordinates: {
                 xScale: d.x-25,
                 yScale: d.y+25,
-              }
+              },
+              tooltipHoveredNode: d,
             });
-            setHoveredNode(d);
             presentToolTip(d, i, nodes);
+            colourNode(d, i, nodes);
           }
         })
         // On mouseout, we want to check if the tooltip is hovered over before making it disappear.
-        .on("mouseout", hideToolTip);
+        .on("mouseout", function(d, i, nodes) {
+          // Define the circle's object properties outside the scope of the tooltip callback functions
+          const dCircle = d;
+          const iCircle = i;
+          const nodesCircle = nodes;
+          // Remove the node's colouring
+          removeNodeColour(d, i, nodes);
+          // Get a selection on the tooltip
+          let tooltip = d3.select("#TooltipID");
+          // Assign mouseover and mouseout handler functions
+          tooltip
+          .on("mouseover", function() {
+            tooltip.transition().style("opacity", 1);
+            // Highlight the circle when hovering over the tooltip
+            colourNode(dCircle, iCircle, nodesCircle);
+          })
+          .on("mouseout", function() {
+            // Remove the circle's colour when mousing out from the tooltip
+            removeNodeColour(dCircle, iCircle, nodesCircle);
+            tooltip
+              .transition()
+              .duration(1000)
+              .style("opacity", 0)
+              // When the transition out is over, reset the coordinates and hovered node so it doesn't re-appear
+              // if the user hovers over the area that it previously appeared
+              .on("end", function() {
+                dispatch({
+                  type: "SET_TOOLTIP_COORDINATES",
+                  tooltipCoordinates: {
+                    xScale: -100,
+                    yScale: -100,
+                  },
+                  tooltipHoveredNode: null,
+                });
+              }); 
+          });
+          // If no mouseover event on tooltip, then fade away
+          tooltip.transition()
+            .duration(1000)
+            .style("opacity", 0)
+            // When the transition out is over, reset the coordinates and hovered node so it doesn't re-appear
+            // if the user hovers over the area that it previously appeared
+            .on("end", function() {
+              // Remove the node's colour when the tooltip fades away
+              removeNodeColour(dCircle, iCircle, nodesCircle);
+              dispatch({
+                type: "SET_TOOLTIP_COORDINATES",
+                tooltipCoordinates: {
+                  xScale: -100,
+                  yScale: -100,
+                },
+                tooltipHoveredNode: null,
+              });
+            });
+        });
       
       nodeUpdate
         .transition()
@@ -274,8 +329,6 @@ function TreeChartD3({
           var o = {x: source.x0, y: source.y0};
           return linkGenerator({source: o, target: o});
         })
-        console.log("- - -")
-      // console.log("links are ", linkEnter)
       // Transition the links to their new position
       linkEnter.merge(link)
         .transition()
@@ -288,8 +341,8 @@ function TreeChartD3({
           }
         })
         .style("stroke-width", function(d) {
-          if (d.source.onSearchPath) {
-            return "1.5px";
+          if (d.target.onSearchPath) {
+            return "2px";
           } else {
             return "1px";
           }
@@ -375,10 +428,7 @@ function TreeChartD3({
       <svg ref={svgRef}>
         <g id="zoomContainer">
           <g id="parentContainer"></g>
-          <Tooltip
-            hoveredNode={hoveredNode}
-            tooltipCoordinates={d3State.tooltipCoordinates}
-          />
+          <Tooltip />
         </g>
       </svg>
     </TreeChartWrapperDiv>

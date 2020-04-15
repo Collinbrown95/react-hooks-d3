@@ -66,7 +66,7 @@ class Footer extends Component {
                         <Disclaimers>
                             <Disclaimer>
                                 Icons used from 
-                                <DisclaimerLink href="https://icons8.com/" target="_blank">Icons8</DisclaimerLink>
+                                <DisclaimerLink href="https://fontawesome.com/" target="_blank">Font Awesome</DisclaimerLink>
                             </Disclaimer>
                             <Separator> | </Separator>
                             <Disclaimer>

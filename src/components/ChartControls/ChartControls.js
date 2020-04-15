@@ -17,8 +17,6 @@ import { dropDownOptions } from "./dropDownData";
 function ChartControls() {
     // State variable to hold dropdown menu options
     const [dropDownList, setDropDownList] = useState(dropDownOptions);
-    // For search results
-    const [searchResult, setSearchResult] = useState();
     // active button in button group
     const [activeButton, setActiveButton] = useState("Employees");
 

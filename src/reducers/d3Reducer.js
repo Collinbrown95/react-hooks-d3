@@ -27,15 +27,36 @@ export const d3Reducer = (state, action) => {
                 dataRoot: action.dataRoot,
                 nodeExpansionPath: action.nodeExpansionPath ? action.nodeExpansionPath : null,
             };
+        // Setting one kind of search results should automatically clear all other search results
         case "SET_EMPLOYEE_SEARCH_RESULTS":
             return {
                 ...state,
-                employeeSearchResults: action.employeeSearchResults
+                employeeSearchResults: action.employeeSearchResults,
+                businessSearchResults: null,
+                seeTeamTitle: null,
+                seeTeamSearchResults: null,
             };
+        case "SET_BUSINESS_SEARCH_RESULTS":
+            return {
+                ...state,
+                employeeSearchResults: null,
+                businessSearchResults: action.businessSearchResults,
+                seeTeamTitle: null,
+                seeTeamSearchResults: null,
+            };
+        case "SET_SEE_TEAM_RESULTS":
+            return {
+                ...state,
+                employeeSearchResults: null,
+                businessSearchResults: null,
+                seeTeamTitle: action.seeTeamTitle,
+                seeTeamSearchResults: action.seeTeamSearchResults,
+            }
         case "SET_TOOLTIP_COORDINATES":
             return {
                 ...state,
                 tooltipCoordinates: action.tooltipCoordinates,
+                tooltipHoveredNode: action.tooltipHoveredNode,
             }
 
         default:

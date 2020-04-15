@@ -166,3 +166,35 @@ export const preProcessNodeLabel = (label) => {
     return label;
   }
 }
+
+/**
+ * Applies node colouring on hover
+ */
+export const colourNode = (d, i, nodes) => {
+    d3.select(nodes[i]).selectAll("circle")
+    .transition()
+    .duration(300)
+    .style("fill", "rgba(219, 0, 106, 0.75)");
+}
+
+export const removeNodeColour = (d, i, nodes) => {
+    // Remove highlighting effect so it is clear that the node is no longer selected
+    d3.select(nodes[i]).selectAll("circle")
+    .transition()
+    .duration(300)
+    // Apply the old fill and stroke styles
+    .style("fill", function(d) {
+      if (d.terminalNode) {
+        return "rgba(219, 0, 106, 0.75)";
+      } else {
+        return d._children ? "#eee" : "#fff";
+      }
+      })
+    .style("stroke", function(d) {
+      if (d.terminalNode) {
+        return "#dc006c";
+      } else {
+        return "#282828";
+      }
+      })
+}

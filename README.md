@@ -1,10 +1,10 @@
 # d3 react integration
-> This repository illustrates one way to integrate D3.js with React. The use case for this integration is an interative searchable tree chart.
+> This repository illustrates one way to integrate D3.js with React. The use case for this integration is an interative searchable organization chart for the Government of Canada. The underlying organization chart data are derived using the [Government of Canada Employee Contact Information](https://open.canada.ca/data/en/dataset/8ec4a9df-b76b-4a67-8f93-cdbc2e040098) dataset that is made available under the [Open Government License - Canada](https://open.canada.ca/en/open-government-licence-canada).
 
 ## Overview and Features
-D3.js is one of the most commonly used javascript libraries for building interactive data visualizations on the web. Similarly, React and the ecosystem of libraries built around React have become one of the most popular choices for building component based user interfaces.
+D3.js is one of the most commonly used JavaScript libraries for building interactive data visualizations on the web. Similarly, React and the ecosystem of libraries built around React have become one of the most popular choices for building component based user interfaces.
 
-The use case of an interactive tree chart was chosen because it includes features that require interactions with React components to cause updates to the D3 visualization, and similarly, it requires that interactions with DOM elements controlled by D3 pass data to React so it can update the application state/render new React components in response to the D3 interaction.
+The use case of an interactive organization chart was chosen because it includes features that require interactions with React components to cause updates to the D3 visualization. Similarly, it requires that interactions with DOM elements controlled by D3 can pass data to React so it can update the application state/render new React components in response to the D3 interaction.
 
 The approach used in this project is to allocate a react component that renders an empty SVG that D3 will treat as the root element. Inside this SVG, D3 has full DOM control, and application-level data are passed from React to D3 through props to the component that renders the SVG.
 

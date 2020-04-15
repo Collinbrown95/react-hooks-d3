@@ -10,15 +10,9 @@ import {
 
 
 function OrgChartPage() {
-    // State variable to hold whether or not a node was hovered over
-    const [hoveredNode, setHoveredNode] = useState();
-
     return (
         <ViewContainer>
-            <TreeChartD3
-              hoveredNode={hoveredNode}
-              setHoveredNode={setHoveredNode}
-            />
+            <TreeChartD3 />
             <ChartControls />
         </ViewContainer>  
     )

@@ -15,6 +15,10 @@ const initialState = {
     searchResultsTitle: "",
     // Employee search results
     employeeSearchResults: [],
+    // Business unit search results
+    businessSearchResults: [],
+    // See Team search results
+    seeTeamSearchResults: [],
     // Node expansion path (this will highlight the path to the node that was searched for).
     nodeExpansionPath: null,
     // Tooltip coordinates
