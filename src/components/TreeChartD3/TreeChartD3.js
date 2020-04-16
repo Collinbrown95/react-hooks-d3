@@ -38,13 +38,11 @@ import { D3Context } from "../../contexts/D3Context";
 function TreeChartD3() {
   // Get the d3 state and action dispatcher
   const { d3State, dispatch } = useContext(D3Context);
-
+  // Set up refs
   const svgRef = useRef();  // hold reference to the SVG element that d3 will render its content into
   const wrapperRef = useRef();  // hold reference to the div element that contains the svg (used for resizing)
-  const dimensions = useResizeObserver(wrapperRef);  // dimensions will change on window resize
-  // The curent zoom state; will rescale the visualization whenever a zoom or pan event occurs
-  // const [currentZoomState, setCurrentZoomSate] = useState("translate(-1,0) scale(1)");
-  // const [clickedNode, setClickedNode] = useState(false);
+  // Use resize observer so that dimensions will change on browser window resize
+  const dimensions = useResizeObserver(wrapperRef);
   // Initial margins
   const margin = {top: 20, right: 120, bottom: 20, left: 120};
   const duration = 750;  // duration is 750 ms

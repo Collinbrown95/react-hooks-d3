@@ -1,8 +1,8 @@
-# React-d3 Integration
+# React-d3 Integration & Use Case: Dynamic Organizational Chart
 > This repository illustrates one way to integrate D3.js with React. The use case for this integration is an interactive searchable organization chart for the Government of Canada. The underlying organization chart data are derived using the [Government of Canada Employee Contact Information (GEDS)](https://open.canada.ca/data/en/dataset/8ec4a9df-b76b-4a67-8f93-cdbc2e040098) dataset that is made available under the [Open Government License - Canada](https://open.canada.ca/en/open-government-licence-canada). The code that was used to extract the org chart from the GEDS dataset can be found [here](https://github.com/Collinbrown95/goc-org-chart/blob/master/back-end/utils.py).
 
 ## Overview and Features
-D3.js is one of the most commonly used JavaScript libraries for building interactive data visualizations on the web. Similarly, React and the ecosystem of libraries built around React have become one of the most popular choices for building component based user interfaces.
+D3.js is one of the most commonly used JavaScript libraries for building interactive data visualizations on the web. Similarly, React and the ecosystem of libraries built around React have become one of the most popular choices for building component based user interfaces. A common use case for integrating the two is to utilize React for its 
 
 The use case of an interactive organization chart was chosen because it includes features that require interactions with React components to cause updates to the D3 visualization. Similarly, it requires that DOM elements controlled by D3 pass data to React so that React can update the application state and render/update components in response to the D3 interaction.
 
@@ -39,10 +39,82 @@ Note that several of these features above use fake data (e.g. fake search result
 ## High Level Overview
 The approach used in this project is to allocate a react component that renders an empty SVG that D3 will treat as the root element. Inside this SVG, D3 has full DOM control, and application-level data are passed from React to D3 through props to the component that renders the SVG.
 
+## React
+
+### React hooks
+This project makes use of [React hooks](https://reactjs.org/docs/hooks-intro.html) to allow functional components to make use of React state and lifecycle features without requiring class components.
+
 ### React refs
 The TreeChartD3 component makes use of [React refs](https://reactjs.org/docs/refs-and-the-dom.html) to hold direct references to the empty SVG as well as the div element that contains it. Using these refs, it is possible to execute d3 code imperatively inside of the TreeChartD3 component. This allows the d3 code to directly modify DOM elements inside of the svg ref outside of React's typical data flow.
 
-Intuitively, this means that the svg ref is the "hand-off" point where React lets d3 take control of the DOM. Unlike ordinary React components that are updating the virtual DOM and 
+Intuitively, this means that the svg ref is the "hand-off" point where React lets d3 take control of the DOM. Unlike ordinary React components that are updating the virtual DOM and allowing React to reconcile differences between the virtual DOM and the "real" DOM, changes to the children of the svg ref will update the "real" DOM directly.
+
+### React effects
+React [effect hooks](https://reactjs.org/docs/hooks-effect.html) allow the user to implement "side effects" the same way they would if using ```componentDidMount``` or ```componentDidUpdate``` with classes in the React lifecycle. The ```useEffect``` hook takes a callback function (the "effect") as an argument. Since the ```useEffect``` hook is placed inside of a functional component, it automatically has access to any state variables or props of that component because the callback passed to ```useEffect``` is already inside the functional component's scope.
+
+By default, ```useEffect``` hook will run the callback function it is passed after every render, however, it is possible to pass ```useEffect`` a [dependency array](https://reactjs.org/docs/hooks-effect.html#tip-optimizing-performance-by-skipping-effects) as a second argument. This dependency array specifies that instead of running the effect hook after every render, React should only run the callback of the effect hook when it detects a change in the variables passed to the dependency array.
+
+This project makes use of a further customization to ```useEffect``` described in [this answer](https://stackoverflow.com/a/57941438) to a Stack Overflow post. The customization is a simple wrapper around ```useEffect``` called ```useDidMountEffect```. This wrapper behaves similarly to ```useEffect```, except the callback is not called on the initial render. ```useDidMountEffect``` basically mimics the functionality of ```componentDidUpdate``` in class based components.
+
+### Resize Observer
+This project makes use of [resize-observer-polyfill](https://www.npmjs.com/package/resize-observer-polyfill) (the polyfill is chosen to make this functionality compatible with older browsers). The resize observer is wrapped in a function called ```useResizeObserver``` that takes a React ref as an argument and returns the dimensions (width and height) of the DOM element that is referenced.
+
+The dimensions returned by ```useResizeObserver``` are one of the arguments to the dependency array in ```useDidMountEffect```, which means the effect callback will run any time there is a change to the dimensions of the ref that wraps the svg element. For example, whenever there is a browser window resize, the width and height of the svg wrapper will change, triggering the effect hook to run again. Inside of the effect callback, the width and height returned by ```useResizeObserver``` are used by d3 to generate the tree layout. This is how dynamic resizing of the d3 visualization is handled in this project.
+
+## State Management
+This project makes use of the [useContext hook](https://reactjs.org/docs/hooks-reference.html#usecontext) and the [Context API](https://reactjs.org/docs/context.html) provided by React. The section below briefly covers the approach used in this project. For a more in-depth explanation of this approach, see [this blog post](https://blog.logrocket.com/use-hooks-and-context-not-react-and-redux/) or [this YouTube tutorial series](https://www.youtube.com/watch?v=6RhOzQciVwI&list=PL4cUxeGkcC9hNokByJilPg5g9m2APUePI&index=1).
+
+### React Context API
+The Context API provides a way for React components to access global state variables without explicitly passing them multiple levels down the component tree (a practice sometimes called "prop drilling"). Prop drilling can be cumbersome and create overhead where components are passed props for the sole purpose of relaying them to downstream child components.
+
+As an alternative, the Context API allows users to create a context object, from which a provider component can be created. The context provider allows data to be passed from the provider to any child components of that provider, no matter how deep in the component tree they are. In this project, the context provider looks as follows:
+
+```JavaScript
+const D3ContextProvider = (props) => {
+    const [d3State, dispatch] = useReducer(d3Reducer, initialState);
+    // Note: in React, child elements are passed to a component as properties.
+    return (
+        <D3Context.Provider value={{d3State, dispatch}}>
+            {props.children}
+        </D3Context.Provider>
+    )
+}
+
+export default D3ContextProvider;
+```
+
+In this case, any child components that are wrapped by the ```D3ContextProvider``` component will have access to the ```d3State``` object and ```dispatch``` function (more information below on ```useReducer```). Since we want to treat ```d3State``` as a global, application level state, we wrap the entire application in the ```D3ContextProvider```. Therefore, inside of ```index.js``` we have:
+
+```JavaScript
+ReactDOM.render(
+  <React.StrictMode>
+    <D3ContextProvider>
+      <App />
+    </D3ContextProvider>
+  </React.StrictMode>,
+  document.getElementById('root')
+);
+```
+
+### useContext hook
+Prior to the introduction of React hooks, a single context could be set as a static property of the component class, and used inside of the ```render``` component method by destructuring the context variables required. To use multiple contexts, components that needed access to the contexts could be wrapped in nested ```<Context.Consumer>``` tags.
+
+Once React hoks were introduced, it became possible to access multiple contexts by extracting any values passed from the context provider using the ```useContext``` hook. For example, in the ```TreeChartD3``` component, the state and dispatcher are extracted with a single line of code:
+```JavaScript
+function TreeChartD3() {
+    // ...
+    const { d3State, dispatch } = useContext(D3Context);
+    // ...
+}
+```
+This project makes use of the ```useContext``` hook to access the global level state provided by ```D3ContextProvider```.
+
+### useReducer hook
+As an alternative to the ```useState``` hook where each state variable is paired with its own setter function, the [useReducer](https://reactjs.org/docs/hooks-reference.html#usereducer) hook implements a pure function (reducer) that maps a state-action pair to a new state. ```useReducer``` works by accepting a reducer as well as an initial state, and returning a reference to that state object and a dispatcher function. The state is immutable, and updates to the state are made using the dispatch function.
+
+## D3
+
+### General Update Pattern
 
 ## D3 and React - general information
 - General update pattern of d3 is to select elements, map and synchronize those elements to data, and define handlers for what should happen to the svgs when data are entered, updated, or exited.
@@ -101,7 +173,8 @@ identityMappingCallback = (d) => {
 - It is assumed there exists some int variable called ```identity``` that exists in a higher scope. One way to implement this correctly is to set this global variable as a state in a parent component, and pass the relevant setState function to the Tree Chart component. This way, when ```useEffect()``` fires again, it will not reset any variables declared in the scope of the ```TreeChart``` functional component.
   - If ```identity``` is set inside the scope of ```TreeChart```, any calls to ```useEffect()``` will reset the identity, which renders the mapping between data and DOM elements prior to the call to ```useEffect()``` incorrect.
 
-
+## Authors
+- Collin Brown - collin.brown@hrsdc-rhdcc.gc.ca
 
 __Sources__
 
