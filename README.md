@@ -56,6 +56,8 @@ By default, ```useEffect``` hook will run the callback function it is passed aft
 
 This project makes use of a further customization to ```useEffect``` described in [this answer](https://stackoverflow.com/a/57941438) to a Stack Overflow post. The customization is a simple wrapper around ```useEffect``` called ```useDidMountEffect```. This wrapper behaves similarly to ```useEffect```, except the callback is not called on the initial render. ```useDidMountEffect``` basically mimics the functionality of ```componentDidUpdate``` in class based components.
 
+This [blog post](https://overreacted.io/a-complete-guide-to-useeffect/) goes into more detail on ```useEffect```.
+
 ### Resize Observer
 This project makes use of [resize-observer-polyfill](https://www.npmjs.com/package/resize-observer-polyfill) (the polyfill is chosen to make this functionality compatible with older browsers). The resize observer is wrapped in a function called ```useResizeObserver``` that takes a React ref as an argument and returns the dimensions (width and height) of the DOM element that is referenced.
 
@@ -79,8 +81,6 @@ const D3ContextProvider = (props) => {
         </D3Context.Provider>
     )
 }
-
-export default D3ContextProvider;
 ```
 
 In this case, any child components that are wrapped by the ```D3ContextProvider``` component will have access to the ```d3State``` object and ```dispatch``` function (more information below on ```useReducer```). Since we want to treat ```d3State``` as a global, application level state, we wrap the entire application in the ```D3ContextProvider```. Therefore, inside of ```index.js``` we have:
@@ -99,7 +99,7 @@ ReactDOM.render(
 ### useContext hook
 Prior to the introduction of React hooks, a single context could be set as a static property of the component class, and used inside of the ```render``` component method by destructuring the context variables required. To use multiple contexts, components that needed access to the contexts could be wrapped in nested ```<Context.Consumer>``` tags.
 
-Once React hoks were introduced, it became possible to access multiple contexts by extracting any values passed from the context provider using the ```useContext``` hook. For example, in the ```TreeChartD3``` component, the state and dispatcher are extracted with a single line of code:
+Once React hooks were introduced, it became possible to access multiple contexts by extracting any values passed from the context provider using the ```useContext``` hook. For example, in the ```TreeChartD3``` component, the state and dispatcher are extracted with a single line of code:
 ```JavaScript
 function TreeChartD3() {
     // ...
@@ -110,18 +110,21 @@ function TreeChartD3() {
 This project makes use of the ```useContext``` hook to access the global level state provided by ```D3ContextProvider```.
 
 ### useReducer hook
-As an alternative to the ```useState``` hook where each state variable is paired with its own setter function, the [useReducer](https://reactjs.org/docs/hooks-reference.html#usereducer) hook implements a pure function (reducer) that maps a state-action pair to a new state. ```useReducer``` works by accepting a reducer as well as an initial state, and returning a reference to that state object and a dispatcher function. The state is immutable, and updates to the state are made using the dispatch function.
+As an alternative to the ```useState``` hook where each state variable is paired with its own setter function, the [useReducer](https://reactjs.org/docs/hooks-reference.html#usereducer) hook implements a pure function (reducer) that maps a state-action pair to a new state. ```useReducer``` works by accepting a reducer as well as an initial state, and returning a state object and a dispatcher function. The reducer is defined in ```d3Reducer.js``` and consists of a switch statement where each case corresponds to a different action. When an action is dispatched, the case in the switch statement is identified by a ```type``` field. Since ```d3State``` cannot be mutated, every case in ```d3Reducer``` returns a new object that contains the previous state along with any updates to state variables specified in the action associated with that case.
+
+### Combining Context API with useReducer to manage global state
+Since ```<App />``` is a child of ```<D3ContextProvider>```, every component under ```<App />``` gets access to ```d3State``` and ```dispatch```. Calls to ```dispatch``` specify a ```type``` field as well as any other fields required to perform an update to the global state. In this way, we need to only pass two props down from our context provider (```d3State``` and ```dispatch```), and any state variable can be accessed and updated using, respectively, ```d3State``` and ```dispatch```. This is in contrast to passing down multiple props from the context provider to enable updating to specific state variables.
 
 ## D3
+The section below breifly covers key d3 concepts that relate to the integration between d3 and React.
 
 ### General Update Pattern
+The general update pattern of d3 is to select elements, map and synchronize those elements to data, and define handlers for what should happen to the svgs when data are entered, updated, or exited. This [blog post](https://www.d3indepth.com/enterexit/) covers this update pattern in more detail.
 
-## D3 and React - general information
-- General update pattern of d3 is to select elements, map and synchronize those elements to data, and define handlers for what should happen to the svgs when data are entered, updated, or exited.
+### D3 Tree Chart
+The original inspiration for the tree chart used in this project is from this [block](https://bl.ocks.org/d3noob/8375092) on [bl.ocks.org](https://bl.ocks.org/).
 
-## ResizeObserver
-
-## D3 tree utilities
+The data used in this project are formatted in the following way:
 ```
 data = {
     "name": "Level 1",
@@ -134,7 +137,7 @@ data = {
         },
         {
             "name": "Level 2 B",
-            "children": [
+            "_children": [
                 ...
             ]
         },
@@ -142,11 +145,13 @@ data = {
     ]
 }
 ```
+Children can be named ```children``` or ```_children```. The former indicates that the children should be indexed by d3's ```hierarchy``` function, while the latter indicates taht the children should not be indexed. Tree node event handlers make use of ```collapse``` and ```expand``` functions defined in ```utils/treeChartD3Utilities.js``` to toggle between these two properties by respectively hiding and showing children.
 
-- Given hierarchical data formatted as above, ```const root = hierarchy(data);``` maps the JSON to a tree data structure with many properties of the tree (e.g. descendents, height, depth, links between nodes, etc.)
-- after calling ```hierarchy(data)```, we get ```root.descendents()``` which is a flat array containing all nodes of the tree, including the root. This is what D3 uses to draw the nodes of the tree.
+Given hierarchical data formatted as shown above, calling ```hierarchy(data)``` returns a tree-like data structure with many properties of the tree (e.g. height, depth, links between nodes, etc.) as well as various methods.
 
-- When we call ```root.links()```, it creates an array of all the links (edges) between nodes in the tree.
+The ```descendents``` method returns a flat array containing all nodes of the tree, including the root. This is what d3 uses to draw the nodes of the tree.
+
+The ```links``` method creates an array of all the links (edges) between nodes in the tree.
 
 - ```const treeLayout = tree().size([height, width]); treeLayout(root)``` Given a height and width (see notes on resize observer above), enriches the nodes of roots with x and y coordinates that are calculated based on the width and height of ```treeLayout```.
 
@@ -173,33 +178,29 @@ identityMappingCallback = (d) => {
 - It is assumed there exists some int variable called ```identity``` that exists in a higher scope. One way to implement this correctly is to set this global variable as a state in a parent component, and pass the relevant setState function to the Tree Chart component. This way, when ```useEffect()``` fires again, it will not reset any variables declared in the scope of the ```TreeChart``` functional component.
   - If ```identity``` is set inside the scope of ```TreeChart```, any calls to ```useEffect()``` will reset the identity, which renders the mapping between data and DOM elements prior to the call to ```useEffect()``` incorrect.
 
+
+### Other helpful resources
+- This [YouTube playlist](https://www.youtube.com/watch?v=Y-ThTzB-Zjk&list=PLDZ4p-ENjbiPo4WH7KdHjh_EMI7Ic8b2B&index=20) covers an approach to integrating D3 and React that is similar to what is used in this project.
+- This [blog post](https://bost.ocks.org/mike/selection/) by Mike Bostock (one of the main developers of d3) on how d3 selections work
+
+
 ## Authors
 - Collin Brown - collin.brown@hrsdc-rhdcc.gc.ca
 
 __Sources__
 
-1. This [YouTube playlist](https://www.youtube.com/watch?v=Y-ThTzB-Zjk&list=PLDZ4p-ENjbiPo4WH7KdHjh_EMI7Ic8b2B&index=20)
-2. [D3 zoom - the missing manual](https://www.freecodecamp.org/news/get-ready-to-zoom-and-pan-like-a-pro-after-reading-this-in-depth-tutorial-5d963b0a153e/)
-3. https://www.d3indepth.com/enterexit/
-4. https://coderwall.com/p/psogia/simplest-way-to-add-zoom-pan-on-d3-js
-5. https://medium.com/@jeffbutsch/using-d3-in-react-with-hooks-4a6c61f1d102
-6. [React effect hooks documentation](https://reactjs.org/docs/hooks-effect.html) and [post on multiple effect hooks](https://stackoverflow.com/questions/54002792/should-i-use-one-or-many-useeffect-in-component) https://reactjs.org/docs/hooks-rules.html
-7. https://stackoverflow.com/questions/47392549/how-to-update-data-in-d3-version-4 <-- change in update pattern from v3 to v4
-8. https://bost.ocks.org/mike/transition/ transitions documentation, https://bost.ocks.org/mike/selection/ selection documentation
-9. https://www.tutorialspoint.com/d3js/d3js_svg_transformation.htm d3 tutorial on svg transformations
-10. https://stackoverflow.com/questions/53253940/make-react-useeffect-hook-not-run-on-initial-render/53254028#53254028 toggling useEffect hook on initial render vs. subsequent renders, https://stackoverflow.com/questions/53253940/make-react-useeffect-hook-not-run-on-initial-render also related
-11. https://www.d3indepth.com/enterexit/ enter update exit pattern in d3
-12. https://bost.ocks.org/mike/selection/ how selection works
-13. [D3 tree with weighted links and color coding](http://bl.ocks.org/shubhgo/80323b7f3881f874c02f)
-14. [collapse function to hide children](https://stackoverflow.com/questions/45326393/how-to-show-only-specific-node-level-in-d3-tree-layout)
-15. [centering with nodeSize vs. size](https://stackoverflow.com/questions/44013555/centering-of-d3-tree-changes-when-specifying-nodesize)
-16. [.separation(callback(a,b)) to deal with spacing nodes that aren't immediate siblings](https://stackoverflow.com/questions/42524376/tree-nodesize-in-d3-v4)
-17. [add tooltip](https://stackoverflow.com/questions/49611148/how-to-add-tooltip-in-react-d3-v4-bar-chart)
-18. [react-d3 tooltip (TODO: see if there is a straightforward way to get the rendered tooltip by its ID then use d3 to handle transitions, delays, etc.)](https://github.com/react-d3/react-d3-tooltip) (see here also https://www.npmjs.com/package/react-d3-tooltip). Other approach could be to add/remove classes and handle transition animations with css (see [here](https://stackoverflow.com/questions/38116805/react-js-d3-charts-tooltip/56674517#56674517)).
-19. [custom dropdown menu tutorial](https://blog.logrocket.com/building-a-custom-dropdown-menu-component-for-react-e94f02ced4a1/) with [github page](https://github.com/dbilgili/Custom-ReactJS-Dropdown-Components).
-20. [D3-react tutorial](https://medium.com/@Elijah_Meeks/interactive-applications-with-react-d3-f76f7b3ebc71)
 
-__React Hooks and Context API__
-1. [this tutorial](https://blog.logrocket.com/use-hooks-and-context-not-react-and-redux/)
-2. [this youtube playlist](https://www.youtube.com/watch?v=6RhOzQciVwI&list=PL4cUxeGkcC9hNokByJilPg5g9m2APUePI&index=1)
-3. [detailed explanation of useEffect and order of updating/rendering](https://overreacted.io/a-complete-guide-to-useeffect/)
+
+
+5. https://www.tutorialspoint.com/d3js/d3js_svg_transformation.htm d3 tutorial on svg transformations
+6.  https://stackoverflow.com/questions/53253940/make-react-useeffect-hook-not-run-on-initial-render/53254028#53254028 toggling useEffect hook on initial render vs. subsequent renders, https://stackoverflow.com/questions/53253940/make-react-useeffect-hook-not-run-on-initial-render also related
+7.  https://www.d3indepth.com/enterexit/ enter update exit pattern in d3
+8.  https://bost.ocks.org/mike/selection/ how selection works
+9.  [D3 tree with weighted links and color coding](http://bl.ocks.org/shubhgo/80323b7f3881f874c02f)
+10. [collapse function to hide children](https://stackoverflow.com/questions/45326393/how-to-show-only-specific-node-level-in-d3-tree-layout)
+11. [centering with nodeSize vs. size](https://stackoverflow.com/questions/44013555/centering-of-d3-tree-changes-when-specifying-nodesize)
+12. [.separation(callback(a,b)) to deal with spacing nodes that aren't immediate siblings](https://stackoverflow.com/questions/42524376/tree-nodesize-in-d3-v4)
+13. [add tooltip](https://stackoverflow.com/questions/49611148/how-to-add-tooltip-in-react-d3-v4-bar-chart)
+14. [react-d3 tooltip (TODO: see if there is a straightforward way to get the rendered tooltip by its ID then use d3 to handle transitions, delays, etc.)](https://github.com/react-d3/react-d3-tooltip) (see here also https://www.npmjs.com/package/react-d3-tooltip). Other approach could be to add/remove classes and handle transition animations with css (see [here](https://stackoverflow.com/questions/38116805/react-js-d3-charts-tooltip/56674517#56674517)).
+15. [custom dropdown menu tutorial](https://blog.logrocket.com/building-a-custom-dropdown-menu-component-for-react-e94f02ced4a1/) with [github page](https://github.com/dbilgili/Custom-ReactJS-Dropdown-Components).
+16. [D3-react tutorial](https://medium.com/@Elijah_Meeks/interactive-applications-with-react-d3-f76f7b3ebc71)
