@@ -60,16 +60,16 @@ const EmployeeResult = ({ employeeData }) => {
         <EmployeeResultOuterDiv>
             <NameTitleDiv>
                 <NameText>
-                    {employeeData.full_name}
+                    {employeeData.full_name ? employeeData.full_name : employeeData.first_name + " " + employeeData.last_name}
                 </NameText>
                 <TitleText>
-                    {employeeData.job_title_en}
+                    {employeeData.job_title_en ? employeeData.job_title_en : employeeData.job_title}
                 </TitleText>
             </NameTitleDiv>
             <BusinessUnitDiv>
                 <div>
                     <BusinessUnitText>
-                        {employeeData.department_en}
+                        {employeeData.department_en ? employeeData.department_en : employeeData.department_name}
                         <span> > </span>
                     </BusinessUnitText>
                 </div>
@@ -78,17 +78,17 @@ const EmployeeResult = ({ employeeData }) => {
                       openInOrgChart(e, employeeData);
                   }}
                 >
-                    {employeeData.org_name_en}
+                    {employeeData.org_name_en ? employeeData.org_name_en : employeeData.org_name}
                 </BusinessUnitLink>
             </BusinessUnitDiv>
             <ContactInfoDiv>
                 <ContactInfoText>
                     {employeeData.email}
                     <span> | </span>
-                    {employeeData.phone}
+                    {employeeData.phone ? employeeData.phone : employeeData.phone_number}
                 </ContactInfoText>
                 <ContactInfoText>
-                    {employeeData.address_en}
+                    {employeeData.address_en ? employeeData.address_en : employeeData.address}
                 </ContactInfoText>
             </ContactInfoDiv>
         </EmployeeResultOuterDiv>

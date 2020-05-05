@@ -1,5 +1,6 @@
 # Specific
 old/
+gifs/
 
 .DS_STORE
 node_modules

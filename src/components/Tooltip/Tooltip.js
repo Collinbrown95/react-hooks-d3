@@ -8,6 +8,8 @@ import {
   ToolTipInnerButton,
 } from "./tooltip-styles";
 
+import axios from "axios";
+
 import { D3Context } from "../../contexts/D3Context";
 
 import { teamSearchResults } from "../../data/SearchResultData/teamSearchResults";
@@ -31,12 +33,24 @@ function Tooltip() {
    * @param {Object} hoveredNode 
    */
   const onTooltipClick = (e, hoveredNode) => {
-    console.log("team results are: ", hoveredNode);
-    dispatch({
-      type: "SET_SEE_TEAM_RESULTS",
-      seeTeamTitle: hoveredNode.data.name,
-      seeTeamSearchResults: teamSearchResults,
-    })
+    const orgID = hoveredNode.data.org_id;
+    axios
+      .get(
+        `http://127.0.0.1:5000/api/v1/employees/${orgID}?lang=en`
+      )
+      .then(({ data })=> {
+        console.log("response is ", data)
+        dispatch({
+          type: "SET_SEE_TEAM_RESULTS",
+          seeTeamTitle: hoveredNode.data.name,
+          seeTeamSearchResults: data,
+        })
+      })
+    // dispatch({
+    //   type: "SET_SEE_TEAM_RESULTS",
+    //   seeTeamTitle: hoveredNode.data.name,
+    //   seeTeamSearchResults: teamSearchResults,
+    // })
   }
 
   // The <foreignObject> SVG element includes elements from a different XML namespace. In the context of a browser, it is most likely (X)HTML.
