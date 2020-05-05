@@ -21,8 +21,8 @@ const SearchResults = () => {
             { d3State.employeeSearchResults &&
                 d3State.employeeSearchResults.map((employee, idx) => (
                     <EmployeeResult
-                      key={idx}
-                      employeeData={employee}
+                      key={employee._id}
+                      employeeData={employee._source}
                     />
                 ))
             }

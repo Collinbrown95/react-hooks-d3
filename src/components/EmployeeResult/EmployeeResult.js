@@ -16,6 +16,10 @@ import {
     ContactInfoText,
 } from "./employee-result-styles";
 
+import axios from "axios";
+import { hierarchy } from "d3";
+import { collapse, expand } from "../../utils/treeChartD3Utilities";
+
 const EmployeeResult = ({ employeeData }) => {
     // Get the d3 state and action dispatcher
     const { dispatch } = useContext(D3Context);
@@ -28,28 +32,44 @@ const EmployeeResult = ({ employeeData }) => {
     const openInOrgChart = (e, employeeData) => {
         console.log("clicked link: ", e.target)
         console.log("data are ", employeeData)
-        dispatch({
-            type: "SET_TREECHART_ROOT",
-            dataRoot: CanadaOrgChart[employeeData.department][0],
-            nodeExpansionPath: employeeData.expansionPath,
-        })
-
+        // If the requested employee belongs in a different org chart to the current one visualized,
+        // request the new org chart, then set the new state to expand to the specified path.
+        axios
+          .get(
+            `http://127.0.0.1:5000/api/v1/department/${employeeData.dept_id}?lang=en`
+          )
+          .then(({ data }) => {
+              console.log("data are ", data)
+              console.log("inside of then ", JSON.parse(employeeData["org_chart_path"]))
+            let orgChart = JSON.parse(data["org_chart"]);
+            // Start by expanding all nodes (TODO: make this done by default in scheduled job to remove this step)
+            expand(orgChart)
+            // index org chart with d3
+            orgChart = hierarchy(orgChart);
+            // Collapse again starting at level 1 so initial view is nice
+            orgChart.children.forEach(collapse);
+            dispatch({
+                type: "SET_TREECHART_ROOT",
+                dataRoot: orgChart,
+                nodeExpansionPath: JSON.parse(employeeData["org_chart_path"]),
+            })
+          });
     }
 
     return ( 
         <EmployeeResultOuterDiv>
             <NameTitleDiv>
                 <NameText>
-                    {employeeData.name}
+                    {employeeData.full_name}
                 </NameText>
                 <TitleText>
-                    {employeeData.title}
+                    {employeeData.job_title_en}
                 </TitleText>
             </NameTitleDiv>
             <BusinessUnitDiv>
                 <div>
                     <BusinessUnitText>
-                        {employeeData.department}
+                        {employeeData.department_en}
                         <span> > </span>
                     </BusinessUnitText>
                 </div>
@@ -58,7 +78,7 @@ const EmployeeResult = ({ employeeData }) => {
                       openInOrgChart(e, employeeData);
                   }}
                 >
-                    {employeeData.businessUnit}
+                    {employeeData.org_name_en}
                 </BusinessUnitLink>
             </BusinessUnitDiv>
             <ContactInfoDiv>
@@ -68,7 +88,7 @@ const EmployeeResult = ({ employeeData }) => {
                     {employeeData.phone}
                 </ContactInfoText>
                 <ContactInfoText>
-                    {employeeData.address}
+                    {employeeData.address_en}
                 </ContactInfoText>
             </ContactInfoDiv>
         </EmployeeResultOuterDiv>

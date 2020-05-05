@@ -11,6 +11,8 @@ import SearchResults from "../SearchResults/SearchResults";
 
 import { dropDownOptions } from "./dropDownData";
 
+import axios from "axios";
+
 
 // import SearchPage from "./SearchBar";
 
@@ -21,9 +23,15 @@ function ChartControls() {
     const [activeButton, setActiveButton] = useState("Employees");
 
     useEffect(() => {
-        // To verify that state variables updated as expected
-        // console.log("new state is ", activeButton);
-    })
+        axios
+          .get(
+            "http://127.0.0.1:5000/api/v1/departments?lang=en"
+          )
+          .then(({ data })  => {
+            console.log(data)
+            setDropDownList(data);
+          });
+    }, []);
 
     const onSearchAcronym = (e) => {
       e.preventDefault(); // prevent the form from automatically submitting + refreshing the page.

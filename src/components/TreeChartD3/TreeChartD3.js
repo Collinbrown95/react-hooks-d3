@@ -392,7 +392,9 @@ function TreeChartD3() {
   function expandToNode(expansionPath, root, treeLayout, width, height, i) {
     // Starting at the specified child of the root node, we want to expand all children along expansionPath. We
     // know that root is expanded to immediate children by default, so children will not be null.
+
     var currentNode = root.children[expansionPath[0]];
+    console.log("current node is ", currentNode)
     // TODO: need way to flag nodes on the expanded path.
     for (var j = 1; j < expansionPath.length; j++) {
       // Give currentNode a property to indicate that it was on the search path
